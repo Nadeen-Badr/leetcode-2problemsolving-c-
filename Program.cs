@@ -3,6 +3,7 @@ using System.Security.Principal;
 using System.ComponentModel;
 using System.Data;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
 
 public class Solution {
     public string MergeAlternately(string word1, string word2) {
@@ -506,4 +507,184 @@ public class Solution {
 
         return true;
     }
+    //13\12\2024
+    public bool CloseStrings(string word1, string word2) {
+        int length= word1.Length;
+        if(length!=word2.Length){
+            return false;
+        }
+        int[] chars1=new int[26];
+        int[] chars2=new int[26];
+        //because theres 26 letters in the alphabet
+        int [] values=new int[length+1];
+        int [] values2=new int[length+1];
+        //why +1?
+        //because String: "aaaa" has Length = 4. but Possible character frequencies: 0, 1, 2, 3, 4.(4+1)
+        getvalues(chars1,values,word1);
+        getvalues(chars2,values2,word2);
+        for (int i = 0; i <26; i++)
+        {
+            // chars1[i] > 0 (a character appears in word1) but chars2[i] == 0 
+            //it doesn't appear in word2, the words cannot be equivalent.
+                if(chars1[i]>0&& chars2[i]==0){
+                    return false;}
+        }
+        //If the number of characters that appear with specific frequencies is not the same, 
+        //the words cannot be rearranged to become equivalent.
+        for (int i = 0; i < length; i++)
+        {
+            if(values[i]!=values2[i]){
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private void getvalues(int[] chars, int[] values, string word)
+    //chars: Tracks how many times each character appears in the input string.
+    //values: Tracks how many characters appear at a specific frequency.
+        {
+        foreach (var c in word)
+        {
+            chars[c-'a']++;
+            values[chars[c-'a']]++;
+        }
+    }
+    public int EqualPairs(int[][] grid) {
+        var result = 0;
+        var rowdict = new Dictionary<string, int>();
+        var cloumdict = new Dictionary<string, int>();
+        for (int i = 0; i < grid.Length; i++)
+        {
+            var rowstr="";
+            var coulmstr="";
+            for (int j = 0; j < grid.Length; j++)
+            {
+                rowstr=rowstr+","+grid[i][j].ToString();
+                coulmstr=coulmstr+","+grid[j][i].ToString();   
+            }
+            if(!rowdict.ContainsKey(rowstr)){
+                rowdict.Add(rowstr,1);
+            }else{
+                rowdict[rowstr]++;
+            }
+            if(!cloumdict.ContainsKey(coulmstr)){
+                cloumdict.Add(coulmstr,1);
+            }else{
+                cloumdict[coulmstr]++;
+            }
+        }
+        foreach (var dict in cloumdict)
+        {
+            if(rowdict.ContainsKey(dict.Key)){
+                result=result+rowdict[dict.Key]*cloumdict[dict.Key];
+            }            
+        }
+        return result;
+    }
+    //another soultion with hash code bec i dont like the other oneis slow =)
+    public int EqualPairsHash(int[][] grid) {
+        var size = grid.Length;
+        var rowHashes = new int[size];
+        var columnHashes = new int[size];
+        var result=0;
+        for (int i = 0; i < grid.Length; i++)
+        {
+            var rowhash=new HashCode();
+            var coulmhash=new HashCode();
+            for (int j = 0; j < grid.Length; j++)
+            {
+                rowhash.Add(grid[i][j]);
+                coulmhash.Add(grid[j][i]);   
+            }
+        rowHashes[i]=rowhash.ToHashCode();
+        columnHashes[i]=coulmhash.ToHashCode();
+        }
+        for (int i = 0; i < size; i++)
+        {
+            for (int j = 0; j < size; j++)
+            {
+                if(rowHashes[i]==columnHashes[j]){
+                    result++;
+                }
+            }
+        }
+        return result;
+    }
+    //basic idea (time limit exceed)
+    public long FindScore(int[] nums) {
+        long score=0;
+        var index=GetSmallestElementIndex(nums);;
+        while(index!=-1){
+           
+            score=score+nums[index];
+            nums[index]=-1;
+            SafeModifyNeighbors(nums,index);
+            index=GetSmallestElementIndex(nums);
+        }
+
+        return score;
+        
+    }
+     static int GetSmallestElementIndex(int[] nums)
+    {
+        // Check if the array is empty or contains only -1 values
+        // if (numbers.Length == 0 || Array.TrueForAll(numbers, x => x == -1))
+        // {
+        //     return -1; 
+        // }
+        // int smallestIndex = 0;
+        // for (int i = 1; i < numbers.Length; i++)
+        // {
+        //     if (numbers[i] < numbers[smallestIndex])
+        //     {
+        //         smallestIndex = i;
+        //     }
+        // }
+        // return smallestIndex;
+        int smallestIndex = -1;
+            for (int i = 0; i < nums.Length; i++) {
+                if (nums[i] != -1 && (smallestIndex == -1 || nums[i] < nums[smallestIndex])) {
+                    smallestIndex = i;
+                }
+            }
+            return smallestIndex;
+    }
+    static void SafeModifyNeighbors(int[] nums, int index)
+    {
+        // Check if index-1 is within bounds
+        if (index - 1 >= 0)
+        {
+            nums[index - 1] = -1;
+        }
+
+        // Check if index+1 is within bounds
+        if (index + 1 < nums.Length)
+        {
+            nums[index + 1] = -1;
+        }
+    }
+    //another soultionusing System;
+
+    public long FindddScore(int[] nums) {
+        PriorityQueue<int, int> pq = new();
+        bool[] marked = new bool[nums.Length];
+        for(int i=0; i<nums.Length; i++)
+            pq.Enqueue(i, nums[i] * 10 + i);
+        
+        long res = 0;
+        while(pq.Count > 0) {
+            int index = pq.Dequeue();
+            if(!marked[index]) {
+                res += nums[index];
+                marked[index] = true;
+                if (index - 1 >= 0) marked[index - 1] = true;
+                if (index + 1 < nums.Length) marked[index + 1] = true;
+            }
+        }
+
+        return res;
+    }
 }
+
+
