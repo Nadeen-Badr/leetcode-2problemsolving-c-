@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Collections.Generic;
 using System.ComponentModel.Design;
+using System.Text;
 
 public class Solution {
     public string MergeAlternately(string word1, string word2) {
@@ -684,6 +685,125 @@ public class Solution {
         }
 
         return res;
+    }
+    //stack p24 p25 and  leetcode-day-14Dec2024 
+    public string RemoveStars(string s) {
+
+        Stack<char> answer= new Stack<char>();
+        for (int i = 0; i < s.Length; i++)
+        {
+            if(s[i]!='*'){
+                //pushing vaild letters only
+                answer.Push(s[i]);
+            }else{
+                answer.Pop();
+            }   
+        }
+        StringBuilder str= new StringBuilder();
+        while (answer.Count>0)
+        {
+            //Pop each character from the stack and insert 
+            //it at the beginning of the StringBuilder. 
+            //This restores the correct order.
+            str.Insert(0,answer.Pop());
+
+        }
+        return str.ToString();
+    }
+    //another soultion
+     public string RemoveStarss(string s) {
+        StringBuilder sb = new StringBuilder();
+        int stars = 0;
+        for (int i = s.Length - 1; i >= 0; i--)
+        {
+            if (s[i] != '*')
+            {
+                if (stars > 0)
+                {//If yes, skip the character (it’s being removed by a star) and decrement stars.
+                    stars--;
+                    continue;
+                }
+                else
+                {
+                    sb.Insert(0, s[i]);
+                }        
+            }
+            else
+            {
+               stars++;  
+
+            }      
+        }
+        return sb.ToString();
+    }
+
+
+// Depending on the collision, the negative asteroid might:
+//Destroy smaller positive asteroids in the stack.
+//Be destroyed by a larger positive asteroid in the stack.
+//Remain in the stack if it survives all collisions.
+    public int[] AsteroidCollision(int[] asteroids) {
+        Stack<int> stack = new Stack<int>();
+        foreach (int ast in asteroids)
+        {
+            if(ast>0)
+            {
+                stack.Push(ast);
+            }
+            else
+            {
+                //if The top positive asteroid is smaller than the negative asteroid.
+                while (stack.Count>0 && stack.Peek()>0&&stack.Peek()<Math.Abs(ast))
+                {
+                    stack.Pop();
+                }
+                //Remain in the stack if it survives all collisions.
+                //was greater than all postive ast in the stack so the stack became empty
+                if(stack.Count==0 || stack.Peek()<0)
+                {
+                    stack.Push(ast);
+                }
+                //both equal both destroy
+                else if(stack.Peek()==Math.Abs(ast))
+                {
+                    stack.Pop();
+                }
+            }
+            
+        }
+        int [] res=new int[stack.Count];
+        for(int i= stack.Count-1;i>=0;i--){
+            //fill the array from the end to the start
+            res[i]=stack.Pop();
+
+        }
+        return res;
+        
+    }
+    //JUST WHY? idk
+    public long ContinuousSubarrays(int[] nums) {
+        int left=0;
+        long answer=0;
+        //These variables track the minimum and maximum values in the current subarray
+        int min=nums[0];
+        int max=nums[0];
+        for(int i=0;i<nums.Length;i++){
+            min=Math.Min(min,nums[i]);
+            max=Math.Max(max,nums[i]);
+            //handle invaild cases
+            while(max-min>2)
+            {
+                left++;
+                min=nums[left];
+                max=nums[left];
+                for(int s=left;s<=i;s++){
+                    min=Math.Min(min,nums[s]);
+                    max=Math.Max(max,nums[s]);
+                }
+            }
+            answer=answer+(i-left+1);
+        }
+        return answer;
     }
 }
 
