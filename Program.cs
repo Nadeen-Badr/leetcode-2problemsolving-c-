@@ -905,6 +905,38 @@ public class Solution {
     }
 
    double Gain(int p, int t)=>(double)(p+1)/(t+1) -(double)p/t;
+    public string PredictPartyVictory(string senate) {
+    Queue<char> sen = new Queue<char>(senate);
+    int R = senate.Count(x => x == 'R');
+    int D = senate.Length - R;
+    // + => R, - => D
+    int scale = 0;
+
+    while (R > 0 && D > 0) {
+        char s = sen.Dequeue();
+        if (s == 'R')
+        {
+            if (scale >= 0) 
+            {
+                D--; // Dire loses a member
+                sen.Enqueue(s); // Radiant senator gets another turn
+            }
+            scale++; // Increment scale towards Radiant
+        }
+        else
+        { // s == 'D'
+            if (scale <= 0)
+            {
+                R--; // Radiant loses a member
+                sen.Enqueue(s); // Dire senator gets another turn
+            }
+            scale--; // Decrement scale towards Dire
+        }
+    }
+
+    return R == 0 ? "Dire" : "Radiant";
+    }
+
    
 }
 
