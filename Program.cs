@@ -805,6 +805,107 @@ public class Solution {
         }
         return answer;
     }
+    //queue
+    public class RecentCounter {
+        Queue<int> q=new Queue<int>();
+
+    public RecentCounter() {
+        
+    }
+    
+    public int Ping(int t) {
+        q.Enqueue(t);
+        //smth to note peek in a stack return the top/ peek in the queue return the bottom
+        while(q.Peek()<3000-t){
+            q.Dequeue();
+        }
+        return q.Count;
+    }
+}
+    public string DecodeString(string s) {
+        Stack<String> str= new Stack<string>();
+        Stack<int> number =new Stack<int>();
+        String currstr="";
+        int currnum=0;
+        foreach (char c in s)
+        {
+            if(c=='[')
+            {
+                str.Push(currstr);
+                number.Push(currnum);
+                currnum=0;
+                currstr="";   
+            }else if(c==']')
+            {
+                currstr=str.Pop()+string.Join("",Enumerable.Repeat(currstr,number.Pop()));
+            }
+            else if (c-'0'<=9 && c - '0' >= 0)
+            {
+                //in case multiple digits
+                currnum = currnum * 10 + (c - '0');
+            }else
+            {
+                currstr=currstr+c;
+            }
+        }
+        return currstr;
+    }
+    // private string DecodeString(string s, int l, int r)
+    // {
+    //     var result = new StringBuilder();
+    //     while (l < r) {
+    //         if ('a' <= s[l] && s[l] <= 'z') {
+    //             result.Append(s[l++]);
+    //             continue;
+    //         }
+    //         int reps = 0;
+    //         while (char.IsDigit(s[l]))
+    //             reps = (reps * 10) + (s[l++] - '0');
+    //         int ll = l, balance = 0;
+    //         do {
+    //             if (s[l] == '[') balance++;
+    //             if (s[l] == ']') balance--;
+    //             l++;
+    //         } while (balance > 0);
+    //         string inner = DecodeString(s, ll + 1, l - 1);
+    //         while (reps-- > 0)
+    //             result.Append(inner);
+    //     }
+    //     return result.ToString();
+    // }
+
+    // public string DecodeString(string s) {
+    //     return DecodeString(s, 0, s.Length);
+    // }
+    public double MaxAverageRatio(int[][] classes, int extraStudents) {
+        double answer =0;
+        var heap= new PriorityQueue<(int pass,int total),double>();
+        foreach( var c in classes)
+        {
+            int p=c[0];
+            int t=c[1];
+            heap.Enqueue((p,t),-Gain(p,t));
+        }
+        while(extraStudents-->0)
+        {
+            //get the highest gain 
+            (int p , int t)=heap.Dequeue();
+            ++p;
+            ++t;
+            //add student calc new gain and add the class to the heap agian with the new gain
+             heap.Enqueue((p,t),-Gain(p,t));
+        }
+        //calcute final sum all class avg ratio
+        while(heap.Count>0)
+        {
+            (int p , int t)=heap.Dequeue();
+            answer=answer+(double)p/t;
+        }
+        return answer/classes.Length;
+    }
+
+   double Gain(int p, int t)=>(double)(p+1)/(t+1) -(double)p/t;
+   
 }
 
 
