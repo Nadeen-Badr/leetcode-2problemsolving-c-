@@ -5,6 +5,7 @@ using System.Data;
 using System.Collections.Generic;
 using System.ComponentModel.Design;
 using System.Text;
+using System.Reflection.Metadata.Ecma335;
 
 public class Solution {
     public string MergeAlternately(string word1, string word2) {
@@ -936,6 +937,103 @@ public class Solution {
 
     return R == 0 ? "Dire" : "Radiant";
     }
+    //daily leet
+    public int[] GetFinalState(int[] nums, int k, int multiplier) {
+        var Heap = new SortedSet<(int value, int index)>();
+        for (int i = 0; i < nums.Length; i++)
+        {
+            Heap.Add((nums[i],i));
+        }
+        for(int i =0;i<k;i++)
+        {
+            var min=Heap.Min;
+            Heap.Remove(min);
+            var update=min.value*multiplier;
+            nums[min.index]=update;
+            Heap.Add((update,min.index));
+        }
+        return nums;  
+    }
+    //another soultion fatser beats 100%
+     public int[] GetFinalState2(int[] nums, int k, int multiplier) {
+        for(int i=0 ; i<k;i++)
+        {   int min=Int32.MaxValue;
+            int minIndex=0;
+            for(int j=0;j<nums.Length;j++)
+            {
+                if(nums[j]<min)
+                {
+                    minIndex=j;
+                    min=nums[j];
+                }
+
+            }
+            nums[minIndex]=nums[minIndex]*multiplier;
+        }
+        return nums;
+    }
+    //linked list problems
+    public class ListNode {
+        public int val;
+        public ListNode next;
+        public ListNode(int val=0, ListNode next=null) {
+            this.val = val;
+            this.next = next;
+        }
+  }
+    public ListNode DeleteMiddle(ListNode head) {
+        //If the list has only one node deleting the middle means the list becomes empty
+        if(head.next==null)
+        {
+            return null;
+        }
+        //If the list has only two nodes
+        if(head.next.next==null)
+        {
+            head.next=null;
+            return head;
+        }
+        ListNode slow =head;
+        ListNode fast =head;
+        ListNode prev =null;
+        //we will make fast moves twice faster than slow so when its null slow will ne at the middle
+        while(fast !=null&& fast.next != null)
+        {
+            prev=slow;
+            slow=slow.next;
+            fast=fast.next.next;
+        }
+        //after finding the middle , delete it
+        //The prev node's next pointer is updated to skip the slow node, effectively removing it from the list.
+        prev.next=slow.next;
+        //The slow.next is set to null to clean up the reference 
+        slow.next=null;
+        return head;   
+    }
+ public ListNode OddEvenList(ListNode head) {
+        if (head == null || head.next == null) {
+        return head;
+        }
+        ListNode Odd =head;
+        ListNode Even =head.next;
+        //last of the odd will pont to the first of the even
+        ListNode FirstEven =Even;
+        while(Odd.next!=null && Even.next!=null)
+        {
+            Odd.next=Even.next;
+            Odd=Odd.next;
+            Even.next=Odd.next;
+            Even=Even.next;
+        }
+        Odd.next=FirstEven;
+        if(Odd.next==null)
+        {
+            Even.next=null;
+        }
+        return head;
+        
+    }
+
 
    
 }
