@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.ComponentModel.Design;
 using System.Text;
 using System.Reflection.Metadata.Ecma335;
+using System.Globalization;
 
 public class Solution {
     public string MergeAlternately(string word1, string word2) {
@@ -1033,9 +1034,174 @@ public class Solution {
         return head;
         
     }
+    //daily before bec i was sick 
+     public string RepeatLimitedString(string inputString, int repeatLimit) {
+        // Frequency array to count occurrences of each letter (0 for 'a', 25 for 'z')
+        int[] letterFrequency = new int[26];
+        
+        // Count the frequency of each letter in the input string
+        foreach (char letter in inputString) {
+            letterFrequency[letter - 'a']++;
+        }
 
+        // StringBuilder to efficiently build the result string
+        StringBuilder result = new StringBuilder();
 
-   
+        // Start with the largest letter (z has index 25)
+        int currentLetterIndex = 25;
+
+        while (true) {
+            int lettersAddedInRow = 0; // Tracks how many times the current letter is added consecutively
+
+            // Add the current letter up to the repeat limit, if available
+            while (currentLetterIndex >= 0 && letterFrequency[currentLetterIndex] > 0 && lettersAddedInRow < repeatLimit) {
+                result.Append((char)(currentLetterIndex + 'a')); // Add the letter to the result
+                letterFrequency[currentLetterIndex]--; // Reduce the frequency
+                lettersAddedInRow++;
+            }
+
+            // If we still have this letter left but cannot add more due to the repeat limit
+            if (letterFrequency[currentLetterIndex] > 0) {
+                int nextLargestLetterIndex = currentLetterIndex - 1; // Find the next largest letter
+
+                // Skip letters that are unavailable (frequency is 0)
+                while (nextLargestLetterIndex >= 0 && letterFrequency[nextLargestLetterIndex] == 0) {
+                    nextLargestLetterIndex--;
+                }
+
+                // If no other letters are available, stop the loop
+                if (nextLargestLetterIndex < 0) break;
+
+                // Add the next largest letter to break the sequence
+                result.Append((char)(nextLargestLetterIndex + 'a'));
+                letterFrequency[nextLargestLetterIndex]--; // Reduce the frequency of the letter
+            } else {
+                // Move to the next smaller letter (reduce the current letter index)
+                currentLetterIndex--;
+
+                // Skip letters that are unavailable (frequency is 0)
+                while (currentLetterIndex >= 0 && letterFrequency[currentLetterIndex] == 0) {
+                    currentLetterIndex--;
+                }
+
+                // If no letters are available, stop the loop
+                if (currentLetterIndex < 0) break;
+            }
+        }
+
+        // Return the final result string
+        return result.ToString();
+    }
+    //daily today was easy
+    public int[] FinalPrices(int[] prices) {
+        for (int i=0;i<prices.Length;i++)
+        {
+            for (int j=i+1;j<prices.Length;j++)
+            {
+                if(prices[j]<=prices[i])
+                {
+                    prices[i]=prices[i]-prices[j];
+                    break;
+                }
+
+            }
+        }
+        return prices;    
+    }
+    //linked list
+    public ListNode ReverseList(ListNode head) {
+        ListNode previous= null;
+        ListNode current =head;
+        ListNode tempNext= null;
+        while(current!= null)
+        {
+            tempNext=current.next;
+            //points backward to the prev node instead of the next node in the original list.
+            current.next=previous;
+            //move pointers now
+            previous=current;
+            current=tempNext;
+        }
+        return previous;  
+    }
+    public int PairSum(ListNode head) {
+        ListNode slow=head;
+        ListNode fast=head;
+        Stack<int> stack =new();
+        int max=0;
+        //reverse first half by pushing in stack
+        while(fast!=null && fast.next!=null)
+        {
+            stack.Push(slow.val);
+            slow=slow.next;
+            fast=fast.next.next;
+        }
+        while(stack.Count>0)
+        {
+            max=Math.Max(max,stack.Pop()+slow.val);
+            slow=slow.next;
+        }
+        return max;  
+    }
+    //binary tree - DFS
+    public class TreeNode
+    {
+        public int val;
+        public TreeNode left;
+        public TreeNode right;
+        public TreeNode(int val = 0, TreeNode left = null, TreeNode right = null)
+        {
+            this.val = val;
+            this.left = left;
+            this.right = right;
+        }
+    }
+     public int MaxDepth(TreeNode root) {
+        if(root==null)
+        {
+            return 0;
+        }
+        if(root.left==null&&root.right==null)
+        {
+            return 1;
+        }
+        return Math.Max(MaxDepth(root.left),MaxDepth(root.right))+1;  
+    }
+    public List<TreeNode> leaves1=new();
+    public List<TreeNode> leaves2=new();
+    public bool LeafSimilar(TreeNode root1, TreeNode root2) {
+        DepthFirstSearch(root1,leaves1);
+        DepthFirstSearch(root2,leaves2);
+        if(leaves1.Count!=leaves2.Count)
+        {
+            return false;
+        }
+        for(int i=0;i<leaves1.Count;i++)
+        {
+            if(leaves1[i].val!=leaves2[i].val)
+            {
+                return false;
+            }
+        }
+        return true ;
+        
+    }
+
+    private void DepthFirstSearch(TreeNode node, List<TreeNode> leaves)
+    {
+       if(node==null)
+       {
+        return;
+       }
+       if(node.left==null && node.right == null)
+       {
+        leaves.Add(node);
+        return;
+       }
+       DepthFirstSearch(node.left,leaves);
+       DepthFirstSearch(node.right,leaves);
+    }
+    
 }
 
 
