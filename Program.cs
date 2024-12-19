@@ -1201,7 +1201,81 @@ public class Solution {
        DepthFirstSearch(node.left,leaves);
        DepthFirstSearch(node.right,leaves);
     }
-    
+    //daily
+     public int MaxChunksToSorted(int[] originalArray) {
+        int len=originalArray.Length;
+        int chunks=0;
+        int orginalPrefixSum =0;
+        int sortedPrefixSum=0;
+        int[]SortedArray=(int[])originalArray.Clone();
+        Array.Sort(SortedArray);
+        for(int i=0;i<len;i++)
+        {
+            orginalPrefixSum=orginalPrefixSum+originalArray[i];
+            sortedPrefixSum=sortedPrefixSum+SortedArray[i];
+            if(orginalPrefixSum==sortedPrefixSum)
+            {
+                chunks++;
+            }
+        }
+        return chunks;
+     }
+     //back to binary tree - DFS
+     public int GoodNodes(TreeNode root) {
+        return CountGoodNodes(root,Int32.MinValue);
+    }
+
+    private int CountGoodNodes(TreeNode node, int currenyMax)
+    {
+        if(node==null)
+        {
+            return 0;
+        }
+        int goodNodeCount = node.val >= currenyMax ? 1 : 0;
+        currenyMax=Math.Max(currenyMax,node.val);
+        goodNodeCount=goodNodeCount+CountGoodNodes(node.left,currenyMax);
+        goodNodeCount=goodNodeCount+CountGoodNodes(node.right,currenyMax);
+        return goodNodeCount;
+    }
+     public int PathSum(TreeNode root, int targetSum) {
+        if (root==null)
+        {
+            return 0;
+        }
+        return CountPathFromNode(root,targetSum)
+        +PathSum(root.right,targetSum)
+        +PathSum(root.left,targetSum);
+    }
+
+    private int CountPathFromNode(TreeNode node, long remaingSum)
+    {
+        if(node==null)
+        {
+            return 0;
+        }
+        int pathcount= node.val==remaingSum? 1:0;
+        pathcount=pathcount+CountPathFromNode(node.left,remaingSum-node.val);
+        pathcount=pathcount+CountPathFromNode(node.right,remaingSum-node.val);
+        return pathcount;
+    }
+    public int LongestZigZag(TreeNode root) {
+        return 0;
+        
+    }
+    //break the binary tree routine =-=
+    public void ReverseString(char[] s) {
+        int left=0;
+        int right= s.Length-1;
+        while(left<right)
+        {
+            char temp= s[left];
+            s[left]=s[right];
+            s[right]=temp;
+            left++;
+            right--;
+        }
+    }
+
 }
 
 
