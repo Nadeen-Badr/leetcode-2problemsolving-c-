@@ -1258,10 +1258,7 @@ public class Solution {
         pathcount=pathcount+CountPathFromNode(node.right,remaingSum-node.val);
         return pathcount;
     }
-    public int LongestZigZag(TreeNode root) {
-        return 0;
-        
-    }
+ 
     //break the binary tree routine =-=
     public void ReverseString(char[] s) {
         int left=0;
@@ -1275,7 +1272,75 @@ public class Solution {
             right--;
         }
     }
+    //daily
+        public TreeNode ReverseOddLevels(TreeNode root) {
+            if(root==null)
+            {
+                return null;
+            }
+            ReverseODDLevelNodes(root.left,root.right,1);
+            return root;
+        
+    }
 
+    private void ReverseODDLevelNodes(TreeNode leftNode, TreeNode rightNode, int level)
+    {
+        if(leftNode==null||rightNode==null)
+        {
+            return;
+        }
+        if(level%2==1)
+        {
+            (leftNode.val,rightNode.val)=(rightNode.val,leftNode.val);
+        }
+         // Process the outer nodes (left child of leftNode, right child of rightNode)
+        ReverseODDLevelNodes(leftNode.left,rightNode.right,level+1);
+         // Process the inner nodes (right child of leftNode, left child of rightNode)
+        ReverseODDLevelNodes(leftNode.right,rightNode.left,level+1);
+    }
+    //sql
+    //SELECT tweet_id FROM Tweets WHERE length(content)>15;
+    //back to 75
+    public int LongestZigZag(TreeNode root) {
+        return Math.Max(
+            FindLongestZigZag(root.left,true,0),
+            FindLongestZigZag(root.right,false,0));   
+    }
+
+    private int FindLongestZigZag(TreeNode node, bool camefromleft, int currentmax)
+    {
+        if(node==null)
+        {
+            return currentmax;
+        }
+        if(camefromleft)
+        {
+           //Reset if going left again, increment if going right
+            return Math.Max(FindLongestZigZag(node.left,true,0),FindLongestZigZag(node.right,false,currentmax+1));
+        }
+        else
+        {
+            //Reset if going right again, increment if going left
+            return Math.Max(FindLongestZigZag(node.left,true,currentmax+1),FindLongestZigZag(node.right,false,0));
+        }
+    }
+    //very good expain of what id LCA https://youtu.be/gs2LMfuOR9k?si=cQqPLTKGMcwSpjkQ
+    public TreeNode LowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
+        // Base Case: If the current node is null or matches either of the target nodes, return it.
+        if(root==null || root==p || root==q)
+        {
+            return root;
+        }
+        TreeNode LeftSubTree=LowestCommonAncestor(root.left,p,q);
+        TreeNode RightSubTree=LowestCommonAncestor(root.right,p,q);
+        // If both subtrees return non-null values, the current node is the LCA.
+        if (LeftSubTree!=null && RightSubTree!=null)
+        {
+            return root;
+        }
+        // Otherwise, return the non-null subtree result (if any).
+        return LeftSubTree ?? RightSubTree;   
+    }
 }
 
 
