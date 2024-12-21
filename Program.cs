@@ -1341,6 +1341,150 @@ public class Solution {
         // Otherwise, return the non-null subtree result (if any).
         return LeftSubTree ?? RightSubTree;   
     }
+    //today is a hard problem Bote that a tree means theres no cycle
+     public int MaxKDivisibleComponents(int n, int[][] edges, int[] values, int k)
+      {
+        //build adjacent list
+        List<int>[] graph = new List<int>[n];
+        foreach(var edge in edges)
+        {
+            int node1=edge[0];
+            int node2=edge[1];
+            if(graph[node1]==null)
+            {
+                graph[node1]=new List<int>();
+            }
+            if(graph[node2]==null)
+            {
+                graph[node2]=new List<int>();
+            }
+            graph[node1].Add(node2);
+            graph[node2].Add(node1);
+        }
+        int KDivisableComponentCount=0;
+        //assume zero is the root and intiall parent
+        DFS(0,-1);
+        return KDivisableComponentCount;
+        long DFS(int currentNode,int parentNode)
+        {
+            long SubTreeSum=values[currentNode];
+            if(graph[currentNode]!=null)
+            {
+                foreach(var neighbor in graph[currentNode])
+                {
+                    //avoid the cycle
+                    if(neighbor!=parentNode)
+                    {
+                        SubTreeSum=SubTreeSum+DFS(neighbor,currentNode);
+                    }
+                }
+            }
+            if(SubTreeSum%k==0)
+            {
+                KDivisableComponentCount++;
+            }
+            return SubTreeSum;
+        }
+      }
+    // binary tree bfs- breadth first search
+    //ill solve this one with DFS tho
+    //  public int MaxLevelSum(TreeNode root) {
+    //     Dictionary<int,int> SumOfLevels=new Dictionary<int, int>();
+    //     void TraverseDFS(TreeNode node, int currentlevel)
+    //     {
+    //         if(node==null)
+    //         {
+    //             return;
+    //         }
+    //         if(!SumOfLevels.ContainsKey(currentlevel))
+    //         {
+    //             SumOfLevels[currentlevel]=0;
+    //         }
+    //         SumOfLevels[currentlevel]=SumOfLevels[currentlevel]+node.val;
+    //         TraverseDFS(node.left,currentlevel+1);
+    //         TraverseDFS(node.right,currentlevel+1);
+    //     }
+    //     TraverseDFS(root,1);
+    //     //find max
+    //     return SumOfLevels.MaxBy(x=>x.Value).Key;
+    //  }
+     //okay it was really slow so ill use BFS
+     //actually really simple and MUCH faster
+     public int MaxLevelSum(TreeNode root) {
+        if(root==null)
+        {
+            return 0;
+        }
+        var nodeQueue=new Queue<TreeNode>();
+        nodeQueue.Enqueue(root);
+        int maxlevel=1;
+        int maxsum =root.val;
+        int currentlevel=0;
+        while(nodeQueue.Count>0)
+        {
+           currentlevel++;
+           int levelsize=nodeQueue.Count;
+           int currentsum=0;
+           //process the current level
+           for(int i=0 ; i< levelsize;i++)
+           {
+            TreeNode currentNode=nodeQueue.Dequeue();
+            currentsum=currentsum+currentNode.val;
+            if(currentNode.left !=null)
+            {
+                nodeQueue.Enqueue(currentNode.left);
+            }
+            if(currentNode.right !=null)
+            {
+                nodeQueue.Enqueue(currentNode.right);
+            }
+           }
+           if(currentsum>maxsum)
+            {
+                maxsum=currentsum;
+                maxlevel=currentlevel;
+            }
+        }
+        return maxlevel;
+     }
+     //unique id nulls will be shown
+//# Write your MySQL query statement below
+//Select p.unique_id , e.name
+//from Employees as e
+//left join EmployeeUNI as p
+//on p.id=e.id;
+    public IList<int> RightSideView(TreeNode root) {
+        if(root==null)
+        {
+            return new List<int>();
+        }
+        var result=new List<int>();
+        var Queue = new Queue<TreeNode>();
+        Queue.Enqueue(root);
+        while(Queue.Count>0)
+        {
+            int levelsize=Queue.Count;
+            int rightmost=0;
+            for(int i=0;i<levelsize;i++)
+            {
+                TreeNode current= Queue.Dequeue();
+                rightmost=current.val;
+                if(current.left!=null)
+                {
+                    Queue.Enqueue(current.left);
+                }
+                if(current.right!=null)
+                {
+                    Queue.Enqueue(current.right);
+                }
+            }
+            result.Add(rightmost);
+        }
+        return result;  
+    }
+
+
+  
 }
 
 
