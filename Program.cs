@@ -1482,9 +1482,143 @@ public class Solution {
         }
         return result;  
     }
+    //daily
+    public int[] LeftmostBuildingQueries(int[] heights, int[][] queries)
+    {
+        int[] res = new int[queries.Length];
+        Array.Fill(res, -1);
 
+        // Dictionary to group queries by the right index
+        var groups = new Dictionary<int, List<(int RequiredHeight, int QueryIndex)>>();
 
-  
+        // Process each query
+        for (int i = 0; i < queries.Length; i++)
+        {
+            int l = Math.Min(queries[i][0], queries[i][1]);
+            int r = Math.Max(queries[i][0], queries[i][1]);
+
+            // If the query is trivial (same building or right is taller), resolve immediately
+            if (l == r || heights[r] > heights[l])
+            {
+                res[i] = r;
+            }
+            else
+            {
+                // Determine the required height for this query
+                int requiredHeight = Math.Max(heights[l], heights[r]);
+
+                // Group the query by the right index
+                if (!groups.ContainsKey(r))
+                {
+                    groups[r] = new List<(int, int)>();
+                }
+                groups[r].Add((requiredHeight, i));
+            }
+        }
+
+        // Min-heap to process queries by required height
+        var minHeap = new PriorityQueue<(int RequiredHeight, int QueryIndex), int>();
+
+        // Iterate through each building's height
+        for (int i = 0; i < heights.Length; i++)
+        {
+            // Add all queries ending at this building to the heap
+            if (groups.ContainsKey(i))
+            {
+                foreach (var query in groups[i])
+                {
+                    minHeap.Enqueue(query, query.RequiredHeight);
+                }
+            }
+
+            // Resolve queries in the heap while the current building satisfies their height requirement
+            while (minHeap.Count > 0 && heights[i] > minHeap.Peek().RequiredHeight)
+            {
+                var (requiredHeight, queryIndex) = minHeap.Dequeue();
+                res[queryIndex] = i; // Update the result for this query
+            }
+        }
+
+        return res;
+    }
+    //some SQL
+    //date diff and join the same table
+    //# Write your MySQL query statement below
+//Select w.id
+//from Weather w, Weather w0
+//Where DATEDIFF(w.recordDate,w0.recordDate)=1 and w.temperature>w0.temperature;
+    //binary search tree
+
+     public TreeNode SearchBST(TreeNode root, int val) {
+        if(root==null || root.val==val)
+        {
+            return root;
+        }
+        if(root.val>val)
+        {
+            return SearchBST(root.left,val);
+        }
+        else
+        {
+            return SearchBST(root.right,val);
+        }
+        
+    }
+
+public TreeNode DeleteNode(TreeNode root, int key)
+{
+    if (root == null)
+    {
+        return null;
+    }
+
+    // Search for the node to delete
+    if (root.val > key)
+    {
+        root.left = DeleteNode(root.left, key);
+    }
+    else if (root.val < key)
+    {
+        root.right = DeleteNode(root.right, key);
+    }
+    else
+    {
+        // Node to be deleted is found
+        if (root.left == null && root.right == null)
+        {
+            // No children (leaf node)
+            return null;
+        }
+        else if (root.left == null)
+        {
+            // Only right child
+            return root.right;
+        }
+        else if (root.right == null)
+        {
+            // Only left child
+            return root.left;
+        }
+        else
+        {
+            // Node has two children: get the inorder successor (smallest in the right subtree)
+            var hold = root.right;
+            while (hold.left != null)
+            {
+                hold = hold.left;
+            }
+            
+            // Copy the inorder successor's value to the current node
+            root.val = hold.val;
+            
+            // Delete the inorder successor from the right subtree
+            root.right = DeleteNode(root.right, hold.val);
+        }
+    }
+
+    return root;
+}
+ 
 }
 
 
