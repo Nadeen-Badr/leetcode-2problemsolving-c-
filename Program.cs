@@ -1298,9 +1298,7 @@ public class Solution {
          // Process the inner nodes (right child of leftNode, left child of rightNode)
         ReverseODDLevelNodes(leftNode.right,rightNode.left,level+1);
     }
-    //sql
-    //SELECT tweet_id FROM Tweets WHERE length(content)>15;
-    //back to 75
+ 
     public int LongestZigZag(TreeNode root) {
         return Math.Max(
             FindLongestZigZag(root.left,true,0),
@@ -1447,12 +1445,7 @@ public class Solution {
         }
         return maxlevel;
      }
-     //unique id nulls will be shown
-//# Write your MySQL query statement below
-//Select p.unique_id , e.name
-//from Employees as e
-//left join EmployeeUNI as p
-//on p.id=e.id;
+ 
     public IList<int> RightSideView(TreeNode root) {
         if(root==null)
         {
@@ -1541,12 +1534,7 @@ public class Solution {
 
         return res;
     }
-    //some SQL
-    //date diff and join the same table
-    //# Write your MySQL query statement below
-//Select w.id
-//from Weather w, Weather w0
-//Where DATEDIFF(w.recordDate,w0.recordDate)=1 and w.temperature>w0.temperature;
+
     //binary search tree
 
      public TreeNode SearchBST(TreeNode root, int val) {
@@ -1618,7 +1606,156 @@ public TreeNode DeleteNode(TreeNode root, int key)
 
     return root;
 }
- 
+//daily headache=-= 
+     public int MinimumOperations(TreeNode root) {
+        if(root==null)
+        {
+            return 0;
+        }
+        Queue<TreeNode> q=new Queue<TreeNode>();
+        q.Enqueue(root);
+        int total=0;
+        while(q.Count>0)
+        {
+            int levelsize=q.Count;
+            List<int>values=new List<int>();
+            for (int i = 0; i < levelsize; i++)
+            {
+                TreeNode node=q.Dequeue();
+                values.Add(node.val);
+                if(node.left!=null)
+                {
+                    q.Enqueue(node.left);
+                }
+                if(node.right!=null)
+                {
+                    q.Enqueue(node.right);
+                }
+                
+            }
+            total=total+GetSwap(values);
+        }
+        return total;   
+    }
+
+    private int GetSwap(List<int> values)
+    {
+        int size=values.Count;
+        int swap=0;
+        List<(int v,int i)> sort= new List<(int v, int i)>();
+        for (int i = 0; i < size; i++)
+        {
+            sort.Add((values[i],i));
+        }
+        // Sort the list of value-index pairs by their values.
+        sort.Sort((a,b)=> a.v.CompareTo(b.v));
+        //Create a visited array to track whether elements are already processed
+        bool[] visited= new bool[size];
+        for (int i = 0; i < size; i++)
+        {
+            // If the element is already visited or is already in its correct position, skip it.
+            if(visited[i]||sort[i].i==i)
+            {
+                continue;
+            }
+            //f a cycle has k elements, you only need 𝑘-1 swaps to sort all  elements because swapping the
+            // elements inside the cycle effectively "rotates" them into their correct positions.
+            int c=0 ;
+            int j=i;
+            while(!visited[j])
+            {
+                visited[j]=true;
+                j=sort[j].i;
+                c++;
+            }
+            if(c>1)
+            {
+                swap=swap+(c-1);
+            }
+        }
+        return swap;
+    }
+    //graph
+    public bool CanVisitAllRooms(IList<IList<int>> rooms) {
+        var q= new Queue<IList<int>>();
+        var visited=new bool [rooms.Count];
+        q.Enqueue(rooms[0]);
+        visited[0]=true;
+        while(q.Count>0)
+        {
+            var size=q.Count;
+            for (int i = 0; i < size; i++)
+            {
+                var keys=q.Dequeue();
+                foreach (var key in keys)
+                {
+                    if(!visited[key])
+                    {
+                    visited[key]=true;
+                    q.Enqueue(rooms[key]);
+                    }    
+                }    
+            }
+        }
+        return !visited.Any(x=>x==false); 
+    }
+    // public int FindCircleNum(int[][] isConnected) {
+    //     int count=0;
+    //     HashSet<int> visited=new HashSet<int>();
+    //     for (int i = 0; i < isConnected.Length; i++)
+    //     {
+    //        if(!visited.Contains(i))
+    //        {
+    //         visited.Add(i);
+    //         condfs(isConnected,i,visited);
+    //         count++;
+    //         } 
+    //     }
+    //     return count;
+    // }
+
+    // private void condfs(int[][] graph, int i, HashSet<int> visited)
+    // {
+    //     for (int j= 0; j < graph[i].Length; j++)
+    //     {
+    //         if(i!=j &&graph[i][j]==1&!visited.Contains(j))
+    //         {
+    //             visited.Add(j);
+    //             condfs(graph,j,visited);
+    //         } 
+    //     } 
+    // }
+    //another better soultion is
+    private bool[] visited;
+    private int[][] graph;
+    private int size;
+    public int FindCircleNum(int[][] isConnected) {
+        size=isConnected.Length;
+        graph=isConnected;
+        visited=new bool[size];
+        int count=0;
+        for (int i = 0; i < size; i++)
+        {
+            if(!visited[i])
+            {
+                condfs(i);
+                count++;
+            }
+        }
+        return count;
+    }
+
+    private void condfs(int i)
+    {
+        visited[i]=true;
+        for (int j = 0; j < size; j++)
+        {
+          if(graph[i][j]==1&&!visited[j])
+          {
+            condfs(j);
+          }  
+        }
+    }
 }
 
 
