@@ -21,3 +21,35 @@ on p.id=e.id
 ----------
 SELECT tweet_id FROM Tweets WHERE length(content)>15;
 ----------
+--Q12/ multiple joins not that easy
+# Write your MySQL query statement below
+select
+s.student_id
+,s.student_name
+,su.subject_name
+,count(e.student_id) attended_exams
+from Students s
+cross join Subjects su
+left join Examinations e
+on s.student_id=e.student_id
+and su.subject_name= e.subject_name
+group by s.student_id,s.student_name,su.subject_name
+order by s.student_id,s.student_name,su.subject_name;
+---------------
+-- this is faster
+# Write your MySQL query statement below
+select Students.student_id, Students.student_name, subjects.subject_name, count(Examinations.subject_name) as attended_exams
+from Students
+cross join subjects
+left join Examinations
+on Students.student_id=Examinations.student_id and subjects.subject_name=Examinations.subject_name
+group by Students.student_name, subjects.subject_name, Students.student_id
+order by Students.student_id , subjects.subject_name
+---------------
+--manger with at least 5 reports nice question about joining the same table
+# Write your MySQL query statement below
+select e.name from Employee e
+join Employee c
+on e.id=c.managerId
+group by c.managerId
+having count(*)>=5;

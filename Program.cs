@@ -7,6 +7,7 @@ using System.ComponentModel.Design;
 using System.Text;
 using System.Reflection.Metadata.Ecma335;
 using System.Globalization;
+using System.Transactions;
 
 public class Solution {
     public string MergeAlternately(string word1, string word2) {
@@ -1755,6 +1756,221 @@ public TreeNode DeleteNode(TreeNode root, int key)
             condfs(j);
           }  
         }
+    }
+    //daily hard
+    private(int,int) Findfarthestnode(int n,List<List<int>> adj,int source)
+    {
+        Queue<int> q=new Queue<int>();
+        bool []visited=new bool[n];
+        q.Enqueue(source);
+        visited[source]=true;
+        int maxDistance=0;
+        int farthestnode=source;
+        while(q.Count>0)
+        {
+            int size=q.Count;
+            for(int i=0;i<size;i++)
+            {
+                int curr=q.Dequeue();
+                farthestnode=curr;
+                foreach (var neighbor in adj[curr])
+                {
+                    if(!visited[neighbor])
+                    {
+                        visited[neighbor]=true;
+                        q.Enqueue(neighbor);
+                    }
+                }
+            }
+            if(q.Count>0)
+            {
+                maxDistance++;
+            }
+        }
+        return(farthestnode,maxDistance); 
+    }
+    private int findDiamter(int n,List<List<int>> adj)
+    {
+        // First BFS to find the farthest node from an arbitrary starting node (e.g., node 0)
+        (int far,int _)=Findfarthestnode(n,adj,0);
+        // Second BFS to find the maximum distance starting from the farthest node found above
+        (int _ , int maxDistance)=Findfarthestnode(n,adj,far);
+        return maxDistance;
+    }
+    private List<List<int>> buildAdj(int size,int [][]edges)
+    {
+        List<List<int>> adj=new List<List<int>>();
+        for(int i=0;i<size;i++)
+        {
+            adj.Add(new List<int>());
+        }
+        foreach(int [] edge in edges)
+        {
+            adj[edge[0]].Add(edge[1]);
+            adj[edge[1]].Add(edge[0]);
+        }
+        return adj;
+    }
+    public int MinimumDiameterAfterMerge(int[][] edges1, int[][] edges2) {
+        int n=edges1.Length+1;
+        int m=edges2.Length+1;
+        List<List<int>> adj1=buildAdj(n,edges1);
+        List<List<int>> adj2=buildAdj(m,edges2);
+        int d1=findDiamter(n,adj1);
+        int d2=findDiamter(m,adj2);
+        int combine=1+(int)Math.Ceiling(d1/2.0)+(int)Math.Ceiling(d2/2.0);
+        return Math.Max(Math.Max(d1,d2),combine);     
+    }
+//     public int MinReorder(int n, int[][] connections) {
+//     List<int>[] graph = new List<int>[n];
+//     HashSet<(int, int)> directEdge = new HashSet<(int, int)>(); 
+
+//     // Initialize the graph for all n nodes
+//     for (int i = 0; i < n; i++) {
+//         graph[i] = new List<int>();
+//     }
+
+//     // Fill the graph with edges and store directed edges in directEdge
+//     for (int i = 0; i < connections.Length; i++) {
+//         graph[connections[i][0]].Add(connections[i][1]);
+//         graph[connections[i][1]].Add(connections[i][0]);
+//         directEdge.Add((connections[i][0], connections[i][1])); // Directed edge from connections[i][0] to connections[i][1]
+//     }
+
+//     int result = 0;
+//     HashSet<int> visited = new HashSet<int>();
+    
+//     // Start DFS from node 0
+//     dfsgraph(graph, directEdge, 0, visited, ref result);   
+//     return result;
+// }
+
+// private void dfsgraph(List<int>[] graph, HashSet<(int, int)> directEdge, int curr, HashSet<int> visited, ref int result) {
+//     visited.Add(curr);
+
+//     // Traverse all the adjacent nodes
+//     foreach (var next in graph[curr]) {
+//         if (!visited.Contains(next)) {
+//             // Check if we need to reverse the edge
+//             if (directEdge.Contains((curr, next))) {
+//                 result++; // Edge needs to be reversed
+//             }
+
+//             // Continue DFS on the next node
+//             dfsgraph(graph, directEdge, next, visited, ref result);
+//         }
+//     }
+// }
+    int count = 0;
+
+    public int MinReorder(int n, int[][] connections) {
+        //graph is defined as an adjList with sign to denote if original (1) or fake (0) road
+        // and connection to denote which city that road leads to
+        List<List<(int sign, int conn)>> adj = new(); 
+
+        for(int i = 0; i < n; i++)
+        { 
+            adj.Add(new List<(int sign, int conn)>()); 
+        }
+
+        foreach(int[] road in connections)
+        {
+            adj[road[0]].Add((1, road[1])); //Adding original road
+            adj[road[1]].Add((0, road[0])); //Adding fake road
+        }
+
+        DFS(0, -1, adj); //DFS from 0. 
+        return count;
+
+    }
+        
+    private void DFS(int current, int parent, List<List<(int sign, int conn)>> adj)
+    {   
+        foreach((int sign, int conn) nei in adj[current])
+        {
+            if(nei.conn == parent) 
+                continue; //Don't want to go in a loop => skip parent in child
+
+            count += nei.sign; //Keep adding sign for wrong roots
+            DFS(nei.conn, current, adj); //Do DFS on child using curr as parent
+        }
+    }
+    //   public double[] CalcEquation(IList<IList<string>> equations, double[] values, IList<IList<string>> queries) {
+    //    // i want to map a->b,a/b
+    //     Dictionary<string, Dictionary<string, double>> map = new(); 
+    //     HashSet<string> visited=new();
+    //     //Combines equations and values to iterate over the numerator, denominator, and result together.
+    //     foreach (var (numenator , denamortor ,val) in equations.Zip(values,(e,v)=>(e[0],e[1],v)))
+    //     {
+    //         if(!map.ContainsKey(numenator)) map[numenator]=new();
+    //         if(!map.ContainsKey(denamortor)) map[denamortor]=new();
+    //         map[numenator][denamortor]=1/val;
+    //         map[denamortor][numenator]=val;
+    //     }
+    //     return queries.Select(s=>Findress(s[1],s[0])).ToArray();    
+    //      double Findress(string source, string target)
+    //     {
+    //         if(!map.ContainsKey(source)) return -1;
+    //         if(source==target) return 1;
+    //         double curr=-1;
+    //         visited.Add(source);
+    //         foreach (var key in map[source].Keys)
+    //         {
+    //             if(visited.Contains(key)) continue;
+    //             curr=Findress(key,target);
+    //             if(curr!=-1)
+    //             {
+    //                 curr=curr*map[source][key];
+    //                 break;
+    //             }   
+    //         }
+    //         visited.Remove(source);
+    //         return curr;
+    //     }
+    // }
+    // was not effeicent
+    //this is probably bettter
+    public double[] CalcEquation(IList<IList<string>> equations, double[] values, IList<IList<string>> queries)
+    {
+         // Build adjacency list to represent the graph
+        var graph = new Dictionary<string, List<(string neighbor, double weight)>>();  
+        for(int i=0;i<equations.Count;i++)
+        {
+            string numerator=equations[i][0];
+            string denominator=equations[i][1];
+            double value = values[i];
+            if(!graph.ContainsKey(numerator))
+                graph[numerator]=new List<(string , double )>();
+            graph[numerator].Add((denominator,value));
+            if(!graph.ContainsKey(denominator))
+                graph[denominator]=new List<(string , double )>();
+            graph[denominator].Add((numerator,1/value));
+        }
+        var results=new double[queries.Count];
+        for(int i=0;i<queries.Count;i++)
+        {
+            string start=queries[i][0];
+            string end = queries[i][1];
+            var visited=new HashSet<string>();
+            results[i]=performDFS(start,end,visited,graph);
+        }
+        return results;
+    }
+
+    private double performDFS(string curr, string target, HashSet<string> visited, Dictionary<string, List<(string neighbor, double weight)>> graph)
+    {
+        if(!graph.ContainsKey(curr)) return -1.0;
+        if(curr==target) return 1.0;
+        visited.Add(curr);
+        foreach (var (nei,weight) in graph[curr])
+        {
+            if(!visited.Contains(nei))
+            {
+                double result=performDFS(nei,target,visited,graph);
+                if(result!=-1) return weight*result;//vaild path found
+            }    
+        }
+        return-1.0;
     }
 }
 
