@@ -1,4 +1,5 @@
-﻿using System.Collections.Immutable;
+﻿using System.Collections;
+using System.Collections.Immutable;
 using System.Security.Principal;
 using System.ComponentModel;
 using System.Data;
@@ -1971,6 +1972,27 @@ public TreeNode DeleteNode(TreeNode root, int key)
             }    
         }
         return-1.0;
+    }
+    //only daily bec sick
+     public IList<int> LargestValues(TreeNode root) {
+        List<int> result=new List<int>();
+       if(root==null) return result;
+       Queue <TreeNode> q=new Queue<TreeNode>();
+       q.Enqueue(root);
+       while(q.Count>0)
+       {
+        int levelsize=q.Count;
+        int max=int.MinValue;
+        for (int i = 0; i < levelsize; i++)
+        {
+            TreeNode curr=q.Dequeue();
+            max=Math.Max(max,curr.val);
+            if(curr.left!=null) q.Enqueue(curr.left);
+            if(curr.right!=null) q.Enqueue(curr.right);
+        }
+        result.Add(max);
+       }
+       return result;   
     }
 }
 
