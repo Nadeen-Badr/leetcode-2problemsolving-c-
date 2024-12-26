@@ -1994,11 +1994,48 @@ public TreeNode DeleteNode(TreeNode root, int key)
        }
        return result;   
     }
-    // daily with LINQ
-      public int FindTargetSumWays(int[] nums, int target,int i=0) =>(i<nums.Length) ?
-       FindTargetSumWays(nums,target-nums[i],i+1)+FindTargetSumWays(nums,target+nums[i],i+1) :target==0?1:0;
-       //another way
-       
+    // // daily with LINQ
+    //   public int FindTargetSumWays(int[] nums, int target,int i=0) =>(i<nums.Length) ?
+    //    FindTargetSumWays(nums,target-nums[i],i+1)+FindTargetSumWays(nums,target+nums[i],i+1) :target==0?1:0;
+    //    //another way
+    public int FindTargetSumWays(int[] nums, int target)
+    {
+        //sum the array
+        int sum =0;
+        foreach (int number in nums)
+        {
+            sum=sum+number;
+        }
+        // Step 2: Calculate the new target (subset sum) based on the equation:
+        // P - N = target, P + N = sum(nums).
+        // This simplifies to P = (target + sum(nums)) / 2.
+        //p is postive n is negative
+        int newtarget=(target+sum)/2;
+        // - If (target + sum) is odd, it's impossible to split the array into subsets with the desired difference.
+        // - If sum < |target|, we can't possibly reach the target sum.
+        // - If sum < newTarget, it's also infeasible to form the subset.
+        if((target+sum)%2==1||sum<Math.Abs(target)||sum<newtarget)
+        {
+            return 0;
+        }
+        // dp[i] represents the number of ways to form a subset sum of `i`.
+        int [] dp=new int[newtarget+1];
+        dp[0]=1;
+        foreach (int number in nums)
+        {
+
+            // Traverse from `newTarget` down to `n` to ensure we don't overwrite results.
+            for(int i=newtarget;i>=number;i--)
+            {
+            // Explanation: dp[i] += dp[i - n] means:
+            // The number of ways to make sum `i` includes all the ways to make sum `i - n`
+            // (by adding the current number `n` to those subsets).
+                dp[i]=dp[i]+dp[i-number];
+            }   
+        }
+        return dp[newtarget];
+    }
+
 }
 
 
