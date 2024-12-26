@@ -1994,6 +1994,11 @@ public TreeNode DeleteNode(TreeNode root, int key)
        }
        return result;   
     }
+    // daily with LINQ
+      public int FindTargetSumWays(int[] nums, int target,int i=0) =>(i<nums.Length) ?
+       FindTargetSumWays(nums,target-nums[i],i+1)+FindTargetSumWays(nums,target+nums[i],i+1) :target==0?1:0;
+       //another way
+       
 }
 
 
