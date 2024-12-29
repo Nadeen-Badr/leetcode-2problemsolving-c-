@@ -2035,6 +2035,223 @@ public TreeNode DeleteNode(TreeNode root, int key)
         }
         return dp[newtarget];
     }
+    //daily
+    public int MaxScoreSightseeingPair(int[] values) {
+        int[] MaxAdjustedVal=new int[values.Length];
+        int max=0;
+        for(int i=1;i<values.Length;i++)
+        {
+            // Update maxAdjustedValue for the current index:
+            // It's the maximum of:
+            // - The previously stored maxAdjustedValue decreased by 1 (distance penalty).
+            // - The value at the previous index decreased by 1 (adjusted for distance).
+            MaxAdjustedVal[i]=Math.Max(MaxAdjustedVal[i-1]-1,values[i-1]-1);
+            // Calculate the score for the sightseeing pair formed by the current element:
+            // - `values[i]`: Value of the current element.
+            // - `maxAdjustedValue[i]`: Best adjusted value up to the current index.
+            max=Math.Max(max,values[i]+MaxAdjustedVal[i]);
+        }
+        return max;
+    }
+     public int NearestExit(char[][] maze, int[] entrance) {
+        int rows=maze.Length;
+        int cols=maze[0].Length;
+        int[][] directions=new int[][]
+        {
+            new int[]{-1,0} ,//up
+            new int[]{1,0},//down
+            new int[]{0,-1} ,//left
+            new int[]{0,1}//right
+        };
+        // Queue for BFS: stores (row, column, steps from the entrance)
+        Queue<(int row,int col,int steps)>q=new Queue<(int , int , int )>();
+        q.Enqueue((entrance[0],entrance[1],0));
+        maze[entrance[0]][entrance[1]]='+';// Mark the entrance as visited
+        while(q.Count>0)
+        {
+            var(currRow,currCol,steps)=q.Dequeue();
+            foreach(var dir in directions)
+            {
+                int newRow=currRow+dir[0];
+                int newcol=currCol+dir[1];
+                // Check if the new position is within bounds and unvisited
+                if(newRow>=0&&newRow<rows&&newcol>=0&&newcol<cols&&maze[newRow][newcol]=='.')
+                {
+                    // If the new position is on the border and not the entrance, it's an exit
+                    if(newRow==0||newRow==rows-1||newcol==0||newcol==cols-1)
+                    {
+                        return steps+1;
+                    }
+                    maze[newRow][newcol]='+';
+                    q.Enqueue((newRow,newcol,steps+1));
+                }
+            }
+        }
+        return -1;   
+    }
+    //3
+    public int OrangesRotting(int[][] grid) {
+
+        int rows=grid.Length;
+        int cols=grid[0].Length;
+        Queue<(int row,int col)>q=new Queue<(int row, int col)>();
+        int fresh=0;
+        for (int i = 0; i < rows; i++)
+        {
+            for (int j = 0; j < cols; j++)
+            {
+               if(grid[i][j]==2)
+               {
+                q.Enqueue((i,j));
+               } 
+               else if(grid[i][j]==1)
+               {
+                fresh++;
+               }
+            }   
+        }
+        List<(int dx,int dy)>direction =new List<(int dx, int dy)>{(-1,0),(1,0),(0,1),(0,-1)};
+        int min=0;
+        while(q.Count>0&&fresh>0)
+        {
+            int currlevel=q.Count;
+            for(int i=0;i<currlevel;i++)
+            {
+                var(currRow,currCol)=q.Dequeue();
+                foreach(var (dx,dy) in direction)
+                {
+                    int newRow=currRow+dx;
+                    int newCol=currCol+dy;
+                     // Skip if the cell is out of bounds or not a fresh orange
+                     if(newRow<0||newCol<0||newRow>=rows||newCol>=cols||grid[newRow][newCol]!=1)
+                     {
+                        continue;
+                     }
+                     grid[newRow][newCol]=2;
+                     q.Enqueue((newRow,newCol));
+                     fresh--;
+                }
+            }
+            min++;
+        }
+        return fresh>0 ? -1:min;
+    }
+    public int[] MaxSumOfThreeSubarrays(int[] nums, int k) {
+        int n=nums.Length;
+        int []ans=[-1,-1,-1];
+        long [] prefixSum=new long[n-k+1];// Prefix sums to store the sum of subarrays of length k
+        int currSum=0;// Current sum of a sliding window of size k
+        for (int i = 0; i < k; i++)
+        {
+            currSum=currSum+nums[i];
+        }
+        //fill using sliding window
+        for (int i = k; i < n; i++)
+        {
+            prefixSum[i-k]=currSum;
+            currSum=currSum+nums[i]-nums[i-k];    
+        }
+        prefixSum[n-k]=currSum;
+        Dictionary<string,long>chace=new();
+        int index=0;
+        int count =0;
+        while(index<=n-((3-count)*k)&&count<3)
+        {
+            // Calculate the maximum sum if we include or skip the current subarray
+            var include=prefixSum[index]+GetMaxSUM(index+k,count+1);
+            var skip=GetMaxSUM(index+1,count);
+            if(include>=skip)
+            {
+                ans[count++]=index;
+                index=index+k;
+            }
+            else
+            {
+                index++;
+            }
+        }
+        return ans; 
+        long GetMaxSUM(int i, int subarraycount)
+        {
+            if(subarraycount==3||i>n-((3-subarraycount)*k)) return 0;
+            //unique key
+            string key=i+"|"+subarraycount;
+            // Check if the result for the current state is already computed
+            if(chace.TryGetValue(key,out long sum)) return sum;
+             // Calculate the sum if the current subarray is included or skipped
+             var inculdesub=prefixSum[i]+GetMaxSUM(i+k,subarraycount+1);
+             var skipsub=GetMaxSUM(i+1,subarraycount);
+             return chace[key]=Math.Max(inculdesub,skipsub);
+        }  
+    }
+    private const long modulus=1000000007;
+    public int NumWays(string[] words, string target) {
+            // Define a constant for modulus to handle large numbers and prevent overflow
+      
+          long[] dp = new long[target.Length];
+         for (int i = 0; i < words[0].Length; i++)
+         {
+            // Calculate the frequency of each letter at the current position in all words
+            int[] letterfreq=CalcLetterFreqAtIndex(words,i);
+            // Traverse the target string from back to front to avoid overwriting values in dp
+            for (int targewt = Math.Min(i,target.Length-1); targewt >= 0; targewt--)
+            {
+                // Get the index of the current letter in the target string
+                int letterIndex=target[targewt]-'a';
+                if(letterfreq[letterIndex]>0)
+                {
+                    // First character in target?
+                    dp[targewt]+=(targewt==0)?letterfreq[letterIndex]:dp[targewt-1]*letterfreq[letterIndex];
+                    // Apply modulus to keep the result within bounds
+                    dp[targewt]%=modulus;
+                }  
+            }
+
+         }
+         return (int)dp[dp.Length-1];
+    }
+
+    private int[] CalcLetterFreqAtIndex(string[] words, int i)
+    {
+       int []letterfreq=new int[26];
+       for (int j = 0; j < words.Length; j++)
+       {
+        // Count the occurrences of each letter at the specified position in all words
+            letterfreq[words[j][i]-'a']++;
+       }
+       return letterfreq;
+    }
+
+//     public class Solution {
+//     private const int MOD = 1000000007;
+//     public int NumWays(string[] words, string target) {
+//         int m = target.Length;
+//         int n = words[0].Length;
+
+//         var freq = new int[n, 26];
+
+//         foreach (var word in words)
+//         {
+//             for (int i = 0; i < n; i++)
+//             {
+//                 freq[i, word[i] - 'a']++;
+//             }
+//         }
+
+//         var dp = new long[m + 1];
+//         dp[0] = 1;
+
+//         for (int i = 0; i < n; i++)
+//         {
+//             for (int j = m - 1; j >= 0; j--)
+//             {
+//                 dp[j + 1] = (dp[j + 1] + dp[j] * freq[i, target[j] - 'a']) % MOD;
+//             }
+//         }
+
+//         return (int)dp[m];
+//     }
+// }
 
 }
 
