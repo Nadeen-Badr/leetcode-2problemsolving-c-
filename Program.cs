@@ -2252,6 +2252,124 @@ public TreeNode DeleteNode(TreeNode root, int key)
 //         return (int)dp[m];
 //     }
 // }
+     public int CountGoodStrings(int low, int high, int zero, int one) {
+        const int mod=1000000007;
+        int[]dp=new int[high+1];   
+        dp[0]=1;
+        for (int i = 1; i < high; i++)
+        {
+            if(i>=zero)
+            {
+                dp[i]=(dp[i]+dp[i-zero])%mod;
+            }
+            if(i>=one)
+            {
+                dp[i]=(dp[i]+dp[i-one])%mod;
+            }   
+        }
+        int res=0;
+        for (int i = low; i < high; i++)
+        {
+            res=(res+dp[i])%mod;
+        }
+        return res;     
+    }
+      public int MincostTickets(int[] days, int[] costs) {
+        int MaxDays=365;
+        bool[] travelday=new bool[MaxDays+1];
+        foreach (var day in days)
+        {
+            travelday[day]=true;
+        }
+        int []dp=new int[MaxDays+1];
+        dp[0]=0;
+        for (int i = 1; i <= MaxDays; i++)
+        {
+            if(!travelday[i])
+            {
+                dp[i]=dp[i-1];
+            }
+            else
+            {
+                int cost1=dp[i-1]+costs[0];
+                int cost7=dp[Math.Min(0,i-7)]+costs[1];
+                int cost30=dp[Math.Min(0,i-30)]+costs[2];
+                dp[i]=Math.Min(cost1,Math.Min(cost7,cost30));
+            }
+        }
+        return dp[MaxDays]; 
+    }
+    public int MaxScore(string s) {
+        int max=0;
+        int zeros=0;
+        int ones=0;
+        foreach (var c in s)
+        {
+            if(c=='1') ones++;
+        }
+        for(int i=0;i<s.Length-1;i++)
+        {
+            if(s[i]=='0')
+            {
+                zeros++;
+            }
+            else
+            {
+                ones--;
+            }
+            int curr=zeros+ones;
+            max=Math.Max(max,curr);
+        }
+        return max;
+    }
+    //daily
+     public int WaysToSplitArray(int[] nums) {
+        int l=nums.Length;
+        long total=0;
+        foreach (var n in nums)
+        {
+            total=total+n;
+        }
+        long leftsum=0;
+        int vaild=0;
+        for (int i = 0; i < l-1; i++)
+        {
+            leftsum=leftsum+nums[i];
+            long right=total-leftsum;
+            if(leftsum>=right)
+            {
+                vaild++;
+            }  
+        }
+        return vaild; 
+    }
+ public int[] VowelStrings(string[] words, int[][] queries) {
+    HashSet<char> vowels = new HashSet<char> { 'a', 'e', 'i', 'o', 'u' };
+    int[] answer = new int[queries.Length];
+    int[] prefix = new int[words.Length];
+    int count = 0;
+
+    for (int i = 0; i < words.Length; i++) {
+        if (vowels.Contains(words[i][0]) && vowels.Contains(words[i][words[i].Length - 1])) {
+            count++;
+        }
+        prefix[i] = count;
+    }
+
+    for (int i = 0; i < queries.Length; i++) {
+        if (queries[i][0] == 0) {
+            answer[i] = prefix[queries[i][1]];
+        } else {
+            answer[i] = prefix[queries[i][1]] - prefix[queries[i][0] - 1];
+        }
+    }
+
+    return answer;
+}
+
+
+    
+
 
 }
 
