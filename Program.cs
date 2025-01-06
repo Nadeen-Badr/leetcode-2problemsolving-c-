@@ -2366,6 +2366,147 @@ public TreeNode DeleteNode(TreeNode root, int key)
 
     return answer;
 }
+ public int CountPalindromicSubsequence(string s) {
+    //A valid palindrome of this type has the form x , y , x , 
+    //where x is the same character at both ends, and y is any character in the middle.
+    HashSet<string> uniquePlan=new HashSet<string>();
+    int size=s.Length;
+    for (char i = 'a'; i <= 'z'; i++)
+    {
+        int f=-1;
+        int l=-1;
+        for (int j = 0; j < size; j++)
+        {
+            if(s[j]==i)
+            {
+                if(f==-1) f=j;
+                else l=j;
+            }  
+        }
+        if(f!=-1&&l>f)
+        {
+            HashSet<char>middle=new HashSet<char>();
+            for (int j = f+1; j < l; j++)
+            {
+                middle.Add(s[j]);   
+            }
+            foreach (var x in middle)
+            {
+                uniquePlan.Add($"{i}{x}{i}");
+            }
+        }   
+    }
+    return uniquePlan.Count;  
+    }
+    public string ShiftingLetters(string s, int[][] shifts) {
+        int n=s.Length;
+        int[] shiftcount=new int[n];// Array to store net shifts for each character
+        foreach (var shift in shifts)
+        {
+            int start=shift[0];
+            int end=shift[1];
+            int direction=shift[2];
+            // Update the shift count for each character in the range [start, end]
+            for (int i = start; i <= end; i++)
+            {
+                 // Increment shift count for forward shift, decrement for backward
+                 shiftcount[i]+=(direction==1)?1:-1;
+            }
+        }
+        char[]res=s.ToCharArray();
+        for (int i = 0; i < n; i++)
+        {
+            int shift=shiftcount[i]%26;
+            if(shift<0) shift+=26;
+            // Shift the character and ensure it wraps around within 'a' to 'z'
+            res[i]=(char)('a'+(res[i]-'a'+shift)%26);
+        }
+        return new string(res);
+    }
+    public int FindKthLargest(int[] nums, int k)
+    {
+        var minheap= new PriorityQueue<int,int>();
+        foreach (var n in nums)
+        {
+            minheap.Enqueue(n,n);
+             // If the heap size exceeds k, remove the smallest element.
+            // This ensures the heap only contains the k largest elements.
+            if(minheap.Count>k)
+            {
+                minheap.Dequeue();
+            }
+        }
+        // The smallest element in the heap is the kth largest element in the array.
+        return minheap.Dequeue();
+    }
+
+    public class SmallestInfiniteSet {
+        private readonly PriorityQueue<int,int>_minheap;
+
+    public SmallestInfiniteSet() {
+        _minheap=new PriorityQueue<int, int>(Enumerable.Range(1,1000).Select(num=>(num,num)));
+    }
+    
+    public int PopSmallest() {
+       int smallest=_minheap.Dequeue();
+       // Remove any duplicates of the smallest number (if they exist)
+        while(_minheap.Count>0&&_minheap.Peek()==smallest)
+        {
+            _minheap.Dequeue();
+        }
+        return smallest;
+    }
+    
+    public void AddBack(int num) {
+        _minheap.Enqueue(num,num);
+    }
+}
+    // o(n^2)
+    //   public int[] MinOperations(string boxes) {
+    //     int n=boxes.Length;
+    //     int[] result=new int[n];
+    //     for (int i = 0; i < n; i++)
+    //     {
+    //         int operations=0;
+    //         for (int j = 0; j < n; j++)
+    //         {
+    //             if(boxes[j]=='1')
+    //             {
+    //                 operations+=Math.Abs(i-j);
+    //             }
+    //         }
+    //         result[i]=operations;
+    //     }
+    //     return result;  
+    // }
+    //o(n)
+     public int[] MinOperations(string boxes)
+    {
+        int n=boxes.Length;
+        int[] result=new int[n];
+        //left pass
+        int balls=0;
+        int operations=0;
+        for (int i = 0; i < n; i++)
+        {
+            result[i]=result[i]+operations;
+            // If the current box has a ball, increment the ball count
+            if(boxes[i]=='1') balls++;
+            //update operations for next element
+            operations=operations+balls;
+        }
+        //right pass
+        balls=0;
+        operations=0;
+        for (int i = n - 1; i >= 0 ; i--)
+        {
+            result[i]=result[i]+operations;
+            if(boxes[i]=='1') balls++;
+            //update operations for next element
+            operations=operations+balls;
+        }
+        return result;
+    }
 
 
     
