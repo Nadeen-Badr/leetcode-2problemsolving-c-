@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System.Threading.Tasks.Dataflow;
+using System.Collections;
 using System.Collections.Immutable;
 using System.Security.Principal;
 using System.ComponentModel;
@@ -9,6 +10,7 @@ using System.Text;
 using System.Reflection.Metadata.Ecma335;
 using System.Globalization;
 using System.Transactions;
+using Microsoft.VisualBasic;
 
 public class Solution {
     public string MergeAlternately(string word1, string word2) {
@@ -2507,11 +2509,181 @@ public TreeNode DeleteNode(TreeNode root, int key)
         }
         return result;
     }
+     public IList<string> StringMatching(string[] words) {
+        List<string> result=new List<string>();
+        for (int i = 0; i < words.Length; i++)
+        {
+            for (int j = 0; j < words.Length; j++)
+            {
+                if(i!=j&&words[j].Contains(words[i]))
+                {
+                    result.Add(words[i]);
+                    break;
+                }
+            }
+        }
+        return result;  
+    }
+ 
+    //or use linq return words.Where(x => words.Where(w => w != x).
+    //Any(w => w.Contains(x))).ToList();
+     public int CountPrefixSuffixPairs(string[] words) {
+        int answer=0;
+        for (int i = 0; i < words.Length; i++)
+        {
+            for (int j = i+1; j < words.Length; j++)
+            {
+                if(i<j)
+                {
+                    if(words[j].StartsWith(words[i]) && words[j].EndsWith(words[i]))
+                    {
+                        answer++;
+                    }
+                }
+            }
+        }
+        return answer;   
+    }
+    //Back75
+      public long MaxScore(int[] nums1, int[] nums2, int k) {
+        List<(int,int)>lst=new();
+        for (int i = 0; i < nums1.Length; i++)
+        {
+            lst.Add((nums1[i],nums2[i]));
+        }
+        lst=lst.OrderByDescending(x=>x.Item2).ToList();
+        PriorityQueue<int,int>pq=new();
+        long sum=0;
+        int min=0;
+        for (int i = 0; i < k; i++)
+        {
+         pq.Enqueue(lst[i].Item1,lst[i].Item1);
+         sum=sum+lst[i].Item1;
+         min=lst[i].Item2;   
+        }
+        long res=sum*min;
+        for (int i = k; i < nums1.Length; i++)
+        {
+            sum=sum+lst[i].Item1-pq.Dequeue();
+            pq.Enqueue(lst[i].Item1,lst[i].Item1);
+            min=lst[i].Item2;
+            res=Math.Max(res,sum*min);   
+        }
+        return res;
+    }
+     public int PrefixCount(string[] words, string pref) {
+        int count=0;
+        foreach (var word in words)
+        {
+            if(word.StartsWith(pref)) count++;
+        }
+        return count;
+    }
+     public int IsPrefixOfWord(string sentence, string searchWord) {
+        string [] words=sentence.Split(' ');
+        for (int i = 0; i < words.Length; i++)
+        {
+            if(words[i].StartsWith(searchWord))
+            {
+                return i+1;
+            }
+        }
+        return -1;
+    }
+    public int CountPrefixes(string[] words, string s) {
+        int count=0;
+        foreach (var word in words)
+        {
+            if(s.StartsWith(word)) count++;
+        }
+        return count;
+    }
+     public bool IsPrefixString(string s, string[] words) {
+        StringBuilder str=new StringBuilder();
+        foreach (var word in words)
+        {
+            str.Append(word);
+            if(str.ToString()==s)return true;
+        }
+        return false; 
+    }
+    public IList<string> WordSubsets(string[] words1, string[] words2) {
+        var res=new List<string>();
+        int []maxfreq=new int[26];
+        foreach (var word in words2)
+        {
+            int []count=Count(word);
+            for (int i = 0; i < 26; i++)
+            {
+                maxfreq[i]=Math.Max(maxfreq[i],count[i]);
+            }
+        }
+        foreach (var word in words1)
+        {
+            int [] count=Count(word);
+            bool vaild=true;
+            for (int i = 0; i < 26; i++)
+            {
+                if(count[i]<maxfreq[i])
+                {
+                    vaild=false;
+                    break;
+                }
+            }
+            if(vaild) res.Add(word);
+        }
+        return res;
+    }
+            private int[] Count(string word){
+            int []count=new int[26];
+            foreach (var c in word)
+            {
+                count[c-'a']++;
+            }
+            return count;
+        }
+         public bool CanConstruct(string s, int k) {
+            if(s.Length<k) return false;
+            int[]freq=new int[26];
+            foreach(char c in s)
+            {
+                freq[c-'a']++;
+            }
+            var odd=0;
+            for (int i = 0; i < 26; i++)
+            {
+                odd+= freq[i]%2 ==0? 0:1;
+            }
+            // A palindrome can only have one odd-frequency character at its center;
+          return odd<=k;
+    }
+      public bool CanBeValid(string s, string locked) {
+        if(s.Length%2==1) return false;
+        var open=0; 
+        var colse=0;
+        for (int i = 0; i < s.Length; i++)
+        {
+            open+= (s[i]==')'&& locked[i]=='1') ? -1:1;
+            if(open<0) return false;
+        }
+        for (int i = s.Length -1 ; i >=0; i--)
+        {
+            colse +=(s[i]=='('&&locked[i]=='1') ? -1 :1;
+            if(colse<0) return false;
+        }
+        return true;
+    }
+    
+
+
+        
+
+}
 
 
     
 
 
-}
+
 
 
