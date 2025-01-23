@@ -2673,10 +2673,308 @@ public TreeNode DeleteNode(TreeNode root, int key)
         }
         return true;
     }
-    
+    //back to 75
+        public long TotalCost(int[] costs, int k, int candidates) {
+            var PQ1=new PriorityQueue<int,int>();
+            var PQ2=new PriorityQueue<int,int>();
+            int i=0;
+            int j= costs.Length-1;
+            long totalcost=0;
+            while(k>0)
+            {
+                while(PQ1.Count<candidates && i<=j)
+                {
+                    PQ1.Enqueue(costs[i],costs[i]);
+                    i++;
+                }
+                  while(PQ2.Count<candidates && j>=i)
+                {
+                    PQ2.Enqueue(costs[j],costs[j]);
+                    j--;
+                }
+                int val1=PQ1.Count>0?PQ1.Peek() : int.MaxValue;
+                int val2=PQ2.Count>0?PQ2.Peek() : int.MaxValue;
+                if(val1<=val2)
+                {
+                    totalcost+=val1;
+                    PQ1.TryDequeue(out _, out _);
+                }
+                else
+                {
+                    totalcost+=val2;
+                    PQ2.TryDequeue(out _, out _);
+                }
+                k--;
+            }
+            return totalcost;
+    }
+    //binary search
+     public int GuessNumber(int n) {
+        int left=0;
+        int right =n;
+        while(left<=right)  
+        {
+            var mid=left+(right-left)/2;
+            var res=guess(mid);
+            if(res==0) return mid;
+            else if(res==-1) right=mid-1;
+            else left=mid+1;
+        } 
+        throw new InvalidOperationException();
+    }
 
+    private int guess(int mid)
+    {
+        throw new NotImplementedException();
+    }
+      public int MinCost(int[][] grid) {
+        int m=grid.Length;
+        int n=grid[0].Length;
+        int[,] cost=new int[m,n];
+        for (int i = 0; i < m; i++)
+        {
+            for (int j = 0; j < n; j++)
+            {
+                cost[i,j]=int.MaxValue;
+            }
+        }
+        cost[0,0]=0;
+        var PQ=new PriorityQueue<(int,int),int>();
+        PQ.Enqueue((0,0),0);
+        int [] [] directions= [[0,1],[0,-1],[1,0],[-1,0]];
+        while(PQ.Count>0)
+        {
+            var(x,y)=PQ.Dequeue();
+            if(x==m-1 & y==n-1)
+            return cost[x,y];
+            int dir=grid[x][y]-1;
+            int newx=x+directions[dir][0];
+            int newy=y+directions[dir][1];
+            if(IsInBound(newx,newy,m,n)&& cost[newx,newy]>cost[x,y])
+            {
+                cost[newx,newy]=cost[x,y];
+                PQ.Enqueue((newx,newy),cost[newx,newy]);
+            }
+            for (int i = 0; i < 4; i++)
+            {
+                newx=x+directions[i][0];
+                newy=y+directions[i][1];
+                if(IsInBound(newx,newy,m,n)&&cost[newx,newy]>cost[x,y]+1)
+                {
+                    cost[newx,newy]=cost[x,y]+1;
+                    PQ.Enqueue((newx,newy),cost[newx,newy]);
+                }
+            }
+        }
+        return -1;
+    }
 
-        
+    private bool IsInBound(int x, int y , int m, int n)
+    {
+        return x>=0&& x<m && y>=0 && y<n;
+    }
+    public int TrapRainWater(int[][] heightMap) {
+        // first of all Get the dimensions of the height map
+        int m=heightMap.Length;
+        int n=heightMap[0].Length;
+        // Priority queue to store boundary points with their height
+        // The queue is ordered by height (smallest height first)
+        var pq=new PriorityQueue<(int x,int y,int val),int>
+        (Comparer<int>.Create((a, b) => a.CompareTo(b)));
+        // Step 1: Add all boundary points to the priority queue
+        // Mark boundary points as visited by setting their height to -1
+        for(int row=0;row<m;row++)
+        {
+            //left boundry
+            pq.Enqueue((row,0,heightMap[row][0]),heightMap[row][0]);
+            heightMap[row][0]=-1; //this is how i mark it as visited
+            //right boundry
+            pq.Enqueue((row,n-1,heightMap[row][n-1]),heightMap[row][n-1]);
+            heightMap[row][n-1]=-1;
+        }
+        for(int col=1;col<n-1;col++)
+        {
+            //top boundry
+            pq.Enqueue((0,col,heightMap[0][col]),heightMap[0][col]);
+            heightMap[0][col]=-1; //this is how i mark it as visited
+            //bottom boundry
+            pq.Enqueue((m-1,col,heightMap[m-1][col]),heightMap[m-1][col]);
+            heightMap[m-1][col]=-1;
+        }
+        // Directions for moving to adjacent cells (right, left, down, up)
+        var dir=new(int dx,int dy)[]{(0,1),(0,-1),(1,0),(-1,0)};
+        int result=0;
+        // Step 2: Process the priority queue
+        while(pq.Count>0)
+        {
+            var(x,y,val)=pq.Dequeue();
+            // Step 3: Check all four neighbors of the current point
+            foreach(var(dx,dy) in dir)
+            {
+                int nx=x+dx;
+                int ny=y+dy;
+                // Skip if the neighbor is out of bounds or already visited
+                if(nx<0||nx>=m||ny<0||ny>=n||heightMap[nx][ny]==-1) continue;
+                // The trapped water is the difference 
+                //between the current boundary height and the neighbor's height
+                result+=Math.Max(0,val-heightMap[nx][ny]);
+                // Step 4: Add the neighbor to the priority queue with the updated height
+                // The new height is the maximum of the current neighbor's height and the boundary heigh
+                int newh=Math.Max(heightMap[nx][ny],val);
+                pq.Enqueue((nx,ny,newh),newh);
+                heightMap[nx][ny]=-1;
+            }
+        }
+        return result;
+    }
+
+     public int FirstCompleteIndex(int[] arr, int[][] mat) {
+        int m=mat.Length;//rows
+        int n=mat[0].Length;//# of cols
+        Dictionary<int,(int r,int c)> postions=new Dictionary<int, (int r, int c)>();
+        for (int i = 0; i < m; i++)
+        {
+            for (int j = 0; j < n; j++)
+            {
+                postions[mat[i][j]]=(i,j);
+            }
+        }
+        int[]paintedrowcount=new int[m];
+        int[] paintedcolcount=new int[n];
+        for (int i = 0; i < arr.Length; i++)
+        {
+            (int row,int col)=postions[arr[i]];
+            paintedrowcount[row]++;
+            paintedcolcount[col]++;
+            //Since n is the number of columns, 
+            //this condition checks if every element in that row has been painted.
+            //and viceversa
+            if(paintedrowcount[row]==n || paintedcolcount[col]==m)
+            return i;
+        }
+        return -1;
+    }
+    // public long GridGame(int[][] grid) {
+    //     int n=grid[0].Length;
+    //     long[] firstrowpreifx=new long[n];
+    //     long[] secondrowpreifx=new long[n];
+    //     firstrowpreifx[0]=grid[0][0];
+    //     secondrowpreifx[0]=grid[1][0];
+    //     for (int i = 1; i < n; i++)
+    //     {
+    //         firstrowpreifx[i]=firstrowpreifx[i-1]+grid[0][i];
+    //         secondrowpreifx[i]=secondrowpreifx[i-1]+grid[1][i];
+    //     }
+    //     long sum=0; long index=-1;
+    //     for (int i = 0; i < n; i++)
+    //     {
+    //         if(firstrowpreifx[i]+secondrowpreifx[i]>sum)
+    //         {
+    //             sum=firstrowpreifx[i]+secondrowpreifx[i];
+    //             index=i;
+    //         }
+    //     }
+    //     long answer=long.MaxValue;
+    //     for (int i = 0; i < n; i++)
+    //     {
+    //         long top=firstrowpreifx[n-1]-firstrowpreifx[i];
+    //         long bottom= i==0?0:secondrowpreifx[i-1];
+    //         answer=Math.Min(answer,Math.Max(top,bottom));
+    //     }
+    //     return answer; 
+    // }
+    public long GridGame(int[][] grid)
+    {
+        long topRowSum = 0;
+        // Calculate the sum of all elements in the top row (grid[0]), excluding the first element
+        for (int i = 1; i < grid[0].Length; i++)
+        {
+            topRowSum=topRowSum+grid[0][i];
+        }
+          // Initialize the variables to track the remaining sum of the top row and the accumulated sum of the bottom row
+        long bottomRowCumulativeSum = 0;
+
+        long optimalResult = topRowSum; // Initially, the result is the total sum of the top row
+        for (int col = 1; col < grid[0].Length; col++)
+        {
+            // Update the sum of the remaining elements in the top row as we move right
+            topRowSum -= grid[0][col];
+
+            // Update the cumulative sum of the bottom row as we progress through the columns
+            bottomRowCumulativeSum += grid[1][col - 1];
+
+            // The optimal result is the minimum of the previous result and the maximum of the current top row sum and the cumulative bottom row sum
+            optimalResult = Math.Min(optimalResult, Math.Max(topRowSum, bottomRowCumulativeSum));
+        }
+        return optimalResult;
+    }
+      public int[][] HighestPeak(int[][] isWater) {
+        int m=isWater.Length;
+        int n=isWater[0].Length;
+        int[][] hight=new int[m][];
+        for (int i = 0; i < m; i++)
+        {
+            hight[i]=new int [n];
+            Array.Fill(hight[i],-1);
+        }
+        var dir=new(int dx,int dy)[]{(0,1),(0,-1),(1,0),(-1,0)};
+        Queue<(int,int)> q=new Queue<(int, int)>();
+        for (int i = 0; i < m; i++)
+        {
+            for (int j = 0; j < n; j++)
+            {
+                if(isWater[i][j]==1)
+                {
+                    hight[i][j]=0;
+                    q.Enqueue((i,j));
+                }
+            }
+        }
+        while(q.Count>0)
+        {
+            var(x,y)=q.Dequeue();
+            foreach (var (dx,dy) in dir)
+            {
+                int nx=x+dx;
+                int ny=y+dy;
+                if(nx>=0&&nx<m&&ny>=0&&ny<n&&hight[nx][ny]==-1)
+                {
+                    hight[nx][ny]=hight[x][y]+1;
+                    q.Enqueue((nx,ny));
+                }
+            }
+        }
+        return hight;
+    }
+       public int CountServers(int[][] grid) {
+        int m=grid.Length;//rows
+        int n=grid[0].Length;
+        int[]CountRow=new int[m];
+        int[] CountCol=new int[n];
+        for (int i = 0; i < m; i++)
+        {
+            for (int j = 0; j < n; j++)
+            {
+                if(grid[i][j]==1)
+                {
+                    CountRow[i]++;
+                    CountCol[j]++;
+                }
+            }
+        }
+        int connect=0;
+        for (int i = 0; i < m; i++)
+        {
+            for (int j = 0; j < n; j++)
+            {
+                if(grid[i][j]==1&&(CountRow[i]>1 || CountCol[j]>1))
+                {
+                   connect++;
+                }
+            }
+        }
+        return connect;
+    }
 
 }
 
