@@ -2975,7 +2975,49 @@ public TreeNode DeleteNode(TreeNode root, int key)
         }
         return connect;
     }
-
+    public int[] LexicographicallySmallestArray(int[] nums, int limit) {
+        int [] sorted=(int []) nums.Clone();
+        Array.Sort(sorted);
+        int current=0;
+        Dictionary<int,int> numgrops=new Dictionary<int, int>();
+        Dictionary<int,Queue<int>> groups=new Dictionary<int, Queue<int>>();
+        numgrops[sorted[0]]=current;
+        groups[current]=new Queue<int>();
+        groups[current].Enqueue(sorted[0]);
+        for (int i = 1; i < sorted.Length; i++)
+        {
+            if(sorted[i]-sorted[i-1]>limit)
+            {
+                current++;
+                groups[current]=new Queue<int>();
+            }
+            numgrops[sorted[i]]=current;
+            groups[current].Enqueue(sorted[i]);
+        }  
+        for (int i = 0; i < nums.Length; i++)
+        {
+            int group=numgrops[nums[i]];
+            nums[i]=groups[group].Dequeue();
+        }
+        return nums; 
+    }
+    public IList<int> EventualSafeNodes(int[][] graph) {
+        var termianlNodeds=new HashSet<int>();
+        var visited= new HashSet<int>();
+        return Enumerable.Range(0,graph.Length).Where(Istermnal).ToArray();
+        bool Istermnal(int node)
+        {
+            if(!visited.Contains(node))
+            {
+                visited.Add(node);
+                if(graph[node].All(Istermnal))
+                {
+                    termianlNodeds.Add(node);
+                }
+            }
+            return termianlNodeds.Contains(node);
+        }   
+    }
 }
 
 
