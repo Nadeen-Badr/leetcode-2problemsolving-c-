@@ -11,6 +11,7 @@ using System.Reflection.Metadata.Ecma335;
 using System.Globalization;
 using System.Transactions;
 using Microsoft.VisualBasic;
+using System.Dynamic;
 
 public class Solution {
     public string MergeAlternately(string word1, string word2) {
@@ -3017,6 +3018,240 @@ public TreeNode DeleteNode(TreeNode root, int key)
             }
             return termianlNodeds.Contains(node);
         }   
+    }
+    public int MaximumInvitations(int[] favorite) {
+        var g=new Dictionary<int,List<int>>();
+        for (int i = 0; i < favorite.Length; i++)
+        {
+            var f=favorite[i];
+            if(!g.ContainsKey(f))
+            {
+                g[f]=new List<int>();
+            }
+            g[f].Add(i);
+        }  
+        //find all 2-person seating arrangment
+        var visted=new HashSet<int>();
+        var maxinvites=0; 
+        var twoman=0;
+        for (int i = 0; i < favorite.Length; i++)
+        {
+            if(visted.Contains(i)) continue;
+            var f=favorite[i];
+            if(favorite[f]==i)
+            {
+                visted.Add(f);
+                visted.Add(i);
+                maxinvites+=Exten(i,visted,g);
+                maxinvites+=Exten(f,visted,g);
+                
+            }
+        }
+        for (int i = 0; i < favorite.Length; i++)
+        {
+            if(!visted.Contains(i))
+            {
+                maxinvites=Math.Max(maxinvites,DepFS(i,favorite,visted,new List<int>(),new HashSet<int>()));
+            }
+        }
+        return maxinvites;
+    }
+    public int Exten(int emp,HashSet<int>v,Dictionary<int,List<int>>g){
+        var q=new Queue<int>();
+        q.Enqueue(emp);
+        int seat=0;
+        while(q.Count>0)
+        {
+            seat++;
+            int count=q.Count;
+            for (int i = 0; i < count; i++)
+            {
+                var f=q.Dequeue();
+                if(!g.ContainsKey(f)) continue;
+                foreach (var next in g[f])
+                {
+                    if(!v.Contains(next))
+                    {
+                        v.Add(next);
+                        q.Enqueue(next);
+                    }
+                }
+            }
+        }
+        return seat;
+    }
+    public int DepFS(int i, int[] favorite, HashSet<int> visted, List<int> list, HashSet<int> hashSet)
+    {
+       if(visted.Contains(i))
+       {
+        if(!hashSet.Contains(i)) return 0;
+        int index=0;
+        for(index=0;index<list.Count;index++)
+        {
+            if(list[index]==i) break;
+        }
+        return list.Count-index;
+       }
+       visted.Add(i);
+       hashSet.Add(i);
+       list.Add(i);
+       return DepFS(favorite[i],favorite,visted,list,hashSet);
+    }
+    public IList<bool> CheckIfPrerequisite(int numCourses, int[][] prerequisites, int[][] queries) {
+        var g=new List<int>[numCourses];
+        for (int i = 0; i < numCourses; i++)
+        {
+            g[i]=new List<int>();
+        }
+        foreach (var p in prerequisites)
+        {
+            g[p[0]].Add(p[1]);
+        }
+        var reachable=new HashSet<int>[numCourses];
+        for (int i = 0; i < numCourses; i++)
+        {
+            reachable[i]=new HashSet<int>();
+        }
+        void DFS(int course,int current)
+        {
+            foreach (var next in g[current])
+            {
+                if(!reachable[course].Contains(next))
+                {
+                    reachable[course].Add(next);
+                    DFS(course,next);
+                }
+            }
+        }
+        for (int i = 0; i < numCourses; i++)
+        {
+            DFS(i,i);
+        }
+        var res=new List<bool>();
+        foreach (var q in queries)
+        {
+           res.Add(reachable[q[0]].Contains(q[1])); 
+        }
+        return res;
+    }
+public int FindMaxFish(int[][] grid) {
+    int m = grid.Length;
+    if (m == 0) return 0;
+    int n = grid[0].Length;
+    int answer = 0;
+    
+    for (int i = 0; i < m; i++) {
+        for (int j = 0; j < n; j++) {
+            if (grid[i][j] > 0) {
+                answer = Math.Max(DFFS(grid, i, j), answer);
+            }
+        }
+    }
+    
+    return answer;
+}
+
+private int DFFS(int[][] grid, int i, int j) {
+ // Check if the cell is out of bounds
+    if (i < 0 || i >= grid.Length || j < 0 || j >= grid[0].Length) {
+        return 0;
+    }
+    
+    // Check if the cell is land or already visited
+    if ( grid[i][j] == 0) {
+        return 0;
+    }
+    
+    // Collect fish in the current cell
+    int fish = grid[i][j];
+    
+    // Mark the cell as visited by setting it to 0
+    grid[i][j] = 0;
+    
+    // Explore all four directions
+    fish += DFFS(grid, i + 1, j);
+    fish += DFFS(grid, i - 1, j);
+    fish += DFFS(grid, i, j + 1);
+    fish += DFFS(grid, i, j - 1);
+    
+    return fish;
+}
+ public int MaxAreaOfIsland(int[][] grid) {
+    int m = grid.Length;
+    if (m == 0) return 0;
+    int n = grid[0].Length;
+    int answer = 0;
+    
+    for (int i = 0; i < m; i++) {
+        for (int j = 0; j < n; j++) {
+            if (grid[i][j] == 1) {
+                answer = Math.Max(DFFFS(grid, i, j), answer);
+            }
+        }
+    }
+    
+    return answer;
+        
+    }
+    private int DFFFS(int[][] grid, int i, int j) {
+ // Check if the cell is out of bounds
+    if (i < 0 || i >= grid.Length || j < 0 || j >= grid[0].Length) {
+        return 0;
+    }
+    
+    // Check if the cell is land or already visited
+    if ( grid[i][j] == 0) {
+        return 0;
+    }
+    
+    // Collect fish in the current cell
+    int l = grid[i][j];
+    
+    // Mark the cell as visited by setting it to 0
+    grid[i][j] = 0;
+    
+    // Explore all four directions
+    l += DFFFS(grid, i + 1, j);
+    l += DFFFS(grid, i - 1, j);
+    l += DFFFS(grid, i, j + 1);
+    l += DFFFS(grid, i, j - 1);
+    
+    return l;
+}
+    public int[] FindRedundantConnection(int[][] edges) {
+        int n=edges.Length;
+        int []parent=new int[n+1];
+        //Initially, each node is its own parent (isolated)
+        for (int i = 1; i <=n; i++)
+        {
+            parent[i]=i;
+        }
+        foreach (int[] edge in edges)
+        {
+            int a=edge[0];
+            int b=edge[1];
+            int rootA=FindDSU(parent,a);
+            int rootB=FindDSU(parent,b);
+            //perviously connected return the redant edge
+            if(rootA==rootB)
+            {
+                return edge; // Cycle detected
+            }
+            // not connected union them
+            parent[rootB]=rootA; // Union
+        }
+        return [];
+    }
+
+    private int FindDSU(int[] parent, int x)
+    {
+        //follow parent pointers until the root is found.
+        if(parent[x]!=x){
+        //Flatten the tree by making nodes point directly to the root 
+        //during the search, speeding up future operations.
+            parent[x]=FindDSU(parent,parent[x]);
+        }
+        return parent[x];
     }
 }
 
