@@ -3253,6 +3253,109 @@ private int DFFS(int[][] grid, int i, int j) {
         }
         return parent[x];
     }
+    public int MagnificentSets(int n, int[][] edges) {
+        //1-build adj list
+        List<List<int>> adj=new List<List<int>>();
+        for (int i = 0; i <=n ; i++)
+        {
+            adj.Add(new List<int>());
+        }
+        foreach (var edge in edges)
+        {
+            int a=edge[0];
+            int b=edge[1];
+            adj[a].Add(b);
+            adj[b].Add(a);
+        }
+         //2-Initialize arrays for tracking colors and visited nodes
+         // To track bipartition colors (0 = uncolored, 1 = color A, -1 = color B)
+         int []colors=new int[n+1];
+         bool[]visited=new bool[n+1];
+         int total=0;
+         //3-Process each connected component
+         for(int i=1;i<=n;i++)
+         {
+            if(!visited[i])
+            {
+                //new component
+                List<int>c=new List<int>();
+                // If not bipartite, return -1 (grouping is impossible)
+                if(!IsBipartite(i,adj,colors,visited,c))
+                {
+                    return -1;
+                }
+                //Calculate the maximum number of groups for this component
+                int maxGroup=FindGroup(c,adj);
+                total+=maxGroup;
+            }
+         }
+         return total;
+    }
+    // check if a component is bipartite using BFS
+    private bool IsBipartite(int start, List<List<int>> adj, int[] colors, bool[] visited, List<int> c)
+    {
+      Queue<int>q=new Queue<int>();
+      q.Enqueue(start);
+      colors[start]=1; // Assign the starting node a color (1 = color A)
+      visited[start]=true;
+      while(q.Count>0)
+      {
+        // Add the node to the current component
+        int n=q.Dequeue();
+        c.Add(n);
+        // Process all neighbors of the current node
+        foreach (var neighbor in adj[n])
+        {
+            if(colors[neighbor]==0)//un colored
+            {
+                colors[neighbor]=-colors[n];//assgin opp color
+                visited[neighbor]=true;
+                q.Enqueue(neighbor);
+            }
+            else if(colors[neighbor]==colors[n])
+            {
+                // If the neighbor has the same color, the graph is not bipartite
+                return false;
+            }
+        }
+      }
+      return true;
+    }
+    private int FindGroup(List<int> c, List<List<int>> adj)
+    {
+        int max=0;
+         // Perform BFS from each node in the component to find the maximum depth
+         foreach (var node in c)
+         {
+            int depth=bfsDepth(node,adj);
+            max=Math.Max(max,depth);
+         }
+         return max;
+    }
+
+    private int bfsDepth(int start, List<List<int>> adj)
+    {
+        Queue<int>q=new Queue<int>();
+        Dictionary<int,int> cahce= new Dictionary<int, int>();
+        q.Enqueue(start);
+        cahce[start]=1;
+        int max=1; // To track the maximum depth
+        while(q.Count>0)
+        {
+            int n=q.Dequeue();
+            int current=cahce[n];
+            foreach (var neighbor in adj[n])
+            {
+                if(!cahce.ContainsKey(neighbor))
+                {
+                    cahce[neighbor]=current+1;
+                    max=Math.Max(max,current+1);
+                    q.Enqueue(neighbor);
+                }
+            }
+        }
+        return max;
+    }
 }
 
 

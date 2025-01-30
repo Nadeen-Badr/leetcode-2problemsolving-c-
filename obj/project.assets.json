@@ -13,11 +13,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\git reeepooos\\leetcode-problemsolving c#\\leetcode-problemsolving c#.csproj",
+      "projectUniqueName": "e:\\.coding\\git reeepooos\\leetcode-problemsolving c#\\leetcode-problemsolving c#.csproj",
       "projectName": "leetcode-problemsolving c#",
-      "projectPath": "D:\\git reeepooos\\leetcode-problemsolving c#\\leetcode-problemsolving c#.csproj",
+      "projectPath": "e:\\.coding\\git reeepooos\\leetcode-problemsolving c#\\leetcode-problemsolving c#.csproj",
       "packagesPath": "C:\\Users\\dream\\.nuget\\packages\\",
-      "outputPath": "D:\\git reeepooos\\leetcode-problemsolving c#\\obj\\",
+      "outputPath": "e:\\.coding\\git reeepooos\\leetcode-problemsolving c#\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\dream\\AppData\\Roaming\\NuGet\\NuGet.Config"
