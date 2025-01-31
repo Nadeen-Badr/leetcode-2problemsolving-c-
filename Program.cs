@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks.Dataflow;
+﻿using System.Runtime.InteropServices;
+using System.Threading.Tasks.Dataflow;
 using System.Collections;
 using System.Collections.Immutable;
 using System.Security.Principal;
@@ -3355,6 +3356,108 @@ private int DFFS(int[][] grid, int i, int j) {
             }
         }
         return max;
+    }
+     public int LargestIsland(int[][] grid) {
+        int n =grid.Length;
+        // Arrays for Union-Find (DSU)
+        int []parent=new int[n*n];
+        int []size=new int[n*n];
+        for (int i = 0; i < n*n; i++)
+        {
+            parent[i]=i;
+            size[i]=1;
+        }
+        int[][] dirs = [[-1, 0],[1, 0],[0, -1],[0, 1]];
+        // Union adjacent 1s using DSU
+        for (int i = 0; i < n; i++)
+        {
+            for (int j = 0; j < n; j++)
+            {
+                if(grid[i][j]==1)//part of an island
+                {
+                    int curr=i*n+j; // Convert 2D index to 1D for DSU
+                
+                    foreach (var dir in dirs)
+                    {
+                    int ni=i+dir[0];
+                    int nj=j+dir[1];
+                    // If the neighbor is within bounds and is also a 1
+                        if(ni>=0&&ni<n&&nj>=0&&nj<n&&grid[ni][nj]==1)
+                        {
+                                int neighbor=ni*n+nj;
+                                Union(curr,neighbor,parent,size);
+                        } 
+                     }
+                }
+            }
+        }
+        // Precompute island sizes
+        Dictionary<int,int>islandsize=new Dictionary<int, int>();
+        for (int i = 0; i < n; i++)
+        {
+            for (int j = 0; j < n; j++)
+            {
+                if(grid[i][j]==1)
+                {
+                    int root=Finnd(i*n+j,parent);// Find the root of the island
+                    islandsize[root]=size[root];
+                }
+            }
+        }
+        // Edge Case: If there are no 1s in the grid, flipping any 0 will create an island of size 1
+        if(islandsize.Count==0) return 1;
+         // Edge Case: If the entire grid is filled with 1s, the largest island is n * n
+        if (islandsize.Count == 1 && islandsize.Values.First() == n * n) return n * n;
+        int max=0;
+         // Evaluate each 0 cell to find the maximum possible island size
+         for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                if (grid[i][j] == 0) { // If the cell is a 0
+                HashSet<int> uniqueRoots = new HashSet<int>(); // To store unique island roots
+                int sum=1;
+                foreach (var dir in dirs) {
+                        int ni = i + dir[0]; // Neighbor row
+                        int nj = j + dir[1]; // Neighbor column
+                        if (ni >= 0 && ni < n && nj >= 0 && nj < n && grid[ni][nj] == 1) {
+                            int root = Finnd(ni * n + nj, parent);
+                             if (!uniqueRoots.Contains(root)) {   // Avoid counting the same island multiple times
+                                uniqueRoots.Add(root);
+                                sum += islandsize[root]; // Add the size of the neighboring island
+                            }
+                        }
+                    }
+                 max = Math.Max(max, sum);
+                }
+            }
+         }
+        // If no 0s exist, return the size of the largest island in the original grid
+        return max == 0 ? islandsize.Values.Max() : max;
+     }
+
+    private void Union(int x, int y, int[] parent, int[] size)
+    {
+        int rootX = Finnd(x, parent); // Find root of x
+        int rootY = Finnd(y, parent); // Find root of y
+         if (rootX != rootY) { // If they are not already in the same set
+            if (size[rootX] < size[rootY]) {
+                // Attach the smaller tree to the larger tree
+                parent[rootX] = rootY;
+                size[rootY] += size[rootX]; // Update the size of the larger tree
+                } else {
+                // Attach the smaller tree to the larger tree
+                parent[rootY] = rootX;
+                size[rootX] += size[rootY]; // Update the size of the larger tree
+            }
+         }
+    }
+
+    private int Finnd(int x, int[] parent)
+    {
+        if(parent[x]!=x)
+        {
+            parent[x]=Finnd(parent[x],parent);
+        }
+        return parent[x];
     }
 }
 
