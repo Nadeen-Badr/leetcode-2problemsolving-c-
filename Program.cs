@@ -3459,6 +3459,62 @@ private int DFFS(int[][] grid, int i, int j) {
         }
         return parent[x];
     }
+    //75 binary Search
+    public int[] SuccessfulPairs(int[] spells, int[] potions, long success) {
+     Array.Sort(potions);
+     int n=spells.Length;
+     int[]res=new int[n];
+     for (int i = 0; i < n; i++)
+     {
+        int s=spells[i];
+        // Formula: (success + spellStrength - 1) / spellStrength
+         long r = (success + s - 1) / s;
+        int first=FindFirstGreatOrEq(potions,r);
+        //the number of valid potions is the total potions minus the index of the first valid potion
+        res[i]=potions.Length-first;
+     }
+     return res;
+    }
+
+    private int FindFirstGreatOrEq(int[] potions, long t)
+    {
+        int low=0;
+        int high=potions.Length;
+        while(low<high)
+        {
+            int mid = low + (high - low) / 2;
+            if(potions[mid]>=t)
+            {
+                // If the mid element is greater than or equal to the target, search the left half
+                high=mid;
+            }
+            else{
+                // Otherwise, search the right half
+                low=mid+1;
+            }
+        }
+        // Return the index of the first element >= target
+        return low;
+    }
+    public int FindPeakElement(int[] nums) {
+        int low=0;
+        int high=nums.Length -1;
+        while(low<high)
+        {
+            int mid=low+(high-low)/2;
+            if(nums[mid]<nums[mid+1])
+            {
+                // Move towards the higher element in the right half
+                low=mid+1;
+            }
+            else{
+                // The peak is in the left half, including mid
+                high=mid;
+            }
+        }
+          // At this point, low == high, which is the peak index
+          return low;
+    }
 }
 
 
