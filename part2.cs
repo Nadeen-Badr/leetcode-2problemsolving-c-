@@ -188,5 +188,61 @@ public class Solution {
         }
         // The answer is the cost to reach the top (one step beyond the last element).
         return dp[n];
+      }
+ 
+ public int Rob(int[] nums) { 
+     // If there are no houses, then there is no money to rob.
+        if (nums == null || nums.Length == 0) return 0;
+        if(nums.Length==1) return nums[0];
+        int n=nums.Length;
+        int[] dp=new int[n];
+        dp[0]=nums[0];
+        dp[1]=Math.Max(nums[0],nums[1]);
+        for (int i = 2; i < n; i++)
+        {
+           // For house i, there are two choices:
+            // 1. Do not rob house i, so the amount remains dp[i-1].
+            // 2. Rob house i, then add the money at house i to dp[i-2] (skipping the adjacent house).
+            dp[i] = Math.Max(dp[i - 1], dp[i - 2] + nums[i]); 
+        }
+        return dp[n-1];
+   }
+   
+ public int RobOptmizwSpace(int[] nums) { 
+     // If there are no houses, then there is no money to rob.
+        if (nums == null || nums.Length == 0) return 0;
+        if(nums.Length==1) return nums[0];
+        int n=nums.Length;
+        int pre2=nums[0]; //This represents dp[0]
+        int pre1=Math.Max(nums[0],nums[1]); // This represents dp[1]
+        for (int i = 2; i < n; i++)
+        {
+           // For house i, there are two choices:
+             // 1. Not robbing the current house (prev1)
+            // 2. Robbing the current house (prev2 + nums[i])
+           int curr = Math.Max(pre1, pre2 + nums[i]); 
+             // Update prev2 and prev1 for the next iteration
+             pre2=pre1;
+             pre1=curr;
+        }
+         // prev1 now holds the maximum amount that can be robbed.
+        return pre1;
+   }
+    public bool AreAlmostEqual(string s1, string s2) {
+        if(s1==s2) return true;
+        int diff=0;
+        int first =-1;
+        int second=-1;
+        for(int i=0; i<s1.Length;i++)
+        {
+            if(s1[i]!=s2[i])
+            {
+                diff++;
+                if(diff>2) return false;
+                if(first==-1) first=i;
+                else second=i;
+            }
+        }
+        return diff==2 && s1[first]==s2[second]&&s1[second]==s2[first];  
     }
 }
