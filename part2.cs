@@ -245,4 +245,30 @@ public class Solution {
         }
         return diff==2 && s1[first]==s2[second]&&s1[second]==s2[first];  
     }
+     public int[] QueryResults(int limit, int[][] queries) {
+        Dictionary<int,int> dic=new Dictionary<int, int>();
+        HashSet<int> colors= new HashSet<int>();
+        List<int> res=new  List<int>();
+        foreach (var q in queries)
+        {
+            int ball =q[0];
+            int c=q[1];
+           
+            //if its already colored
+            if(dic.ContainsKey(ball))
+            {
+                int old=dic[ball];
+                dic.Remove(ball);
+                //color doesnt  exitss in other balls?
+                if(!dic.ContainsValue(old))
+                {
+                    colors.Remove(old);
+                }
+            }
+            dic[ball]=c;
+            colors.Add(c);
+            res.Add(colors.Count);
+        }
+        return res.ToArray();
+    }
 }
