@@ -271,4 +271,22 @@ public class Solution {
         }
         return res.ToArray();
     }
+    public int TupleSameProduct(int[] nums) {
+        Dictionary<int,int> dic=new Dictionary<int, int>();
+        int res=0;
+        for (int i = 0; i < nums.Length; i++)
+        {
+            for (int j = i+1; j < nums.Length; j++)
+            {
+                int prod=nums[i]*nums[j];
+                if(!dic.ContainsKey(prod)) dic[prod]=0;
+                dic[prod]++; 
+            }
+        }
+        foreach (int c in dic.Values)
+        {
+           if(c>1) res+=(c*(c-1)/2) *8; // C(count, 2) * 8 permutations
+        }
+        return res;
+    }
 }
