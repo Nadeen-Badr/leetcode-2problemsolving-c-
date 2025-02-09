@@ -289,4 +289,43 @@ public class Solution {
         }
         return res;
     }
+    public class NumberContainers {
+        // Maps each index to its latest assigned number.
+    private Dictionary<int, int> indexToNumber;
+    
+    // Maps each number to a priority queue (min-heap) storing its indices.
+    private Dictionary<int, PriorityQueue<int, int>> numberToIndices;
+    public NumberContainers() {
+         indexToNumber = new Dictionary<int, int>();
+        numberToIndices = new Dictionary<int, PriorityQueue<int, int>>();
+    }
+    
+    public void Change(int index, int number) {
+        if(indexToNumber.ContainsKey(index))
+        {
+            int old=indexToNumber[index];
+            if(numberToIndices.ContainsKey(old))
+            {
+                numberToIndices[old].Enqueue(index, int.MaxValue); // Mark as invalid
+            }        
+        }
+        indexToNumber[index]=number;
+        if(!numberToIndices.ContainsKey(number))
+        {
+            numberToIndices[number]=new PriorityQueue<int, int>();
+        }  
+            numberToIndices[number].Enqueue(index, index);      
+    }
+    
+    public int Find(int number) {
+         // If the number doesn't exist, return -1
+        if (!numberToIndices.ContainsKey(number)) return -1;
+        var pq=numberToIndices[number];
+        // Remove invalid (outdated) indices
+        while (pq.Count > 0 && indexToNumber[pq.Peek()] != number) {
+            pq.Dequeue();
+        }
+         return pq.Count > 0 ? pq.Peek() : -1;
+    }
+}
 }
