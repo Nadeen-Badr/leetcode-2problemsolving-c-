@@ -328,4 +328,57 @@ public class Solution {
          return pq.Count > 0 ? pq.Peek() : -1;
     }
 }
+   public long CountBadPairs(int[] nums) {
+        int n=nums.Length;
+        int total=n*(n-1)/2;
+        int good=0;
+        Dictionary<int,int> d=new Dictionary<int, int>();
+       for (int i = 0; i < n; i++)
+       {
+            int key=nums[i]-i;
+            if(d.ContainsKey(key)) good+=d[key];
+            d[key] = d.GetValueOrDefault(key, 0) + 1;
+       }
+        return total-good;
+    }
+     public long CountBa2dPairs(int[] nums) {
+        long n=nums.Length;
+        long total=n*(n-1)/2;
+        long good=0;
+        Dictionary<long,long> d=new Dictionary<long, long>();
+       for (int i = 0; i < n; i++)
+       {
+            long key=nums[i]-i;
+            if(d.ContainsKey(key)) good+=d[key];
+            d[key] = d.GetValueOrDefault(key, 0) + 1;
+       }
+        return total-good;
+    }
+      public string RemoveOccurrences(string s, string part) {
+   
+        int index;
+        while((index=s.IndexOf(part))!=-1)
+        {
+          s=s.Remove(index,part.Length);
+        }
+         return s;
+    }
+  public string ClearDigits(string s) {
+        string ans="";
+        foreach (char c in s)
+        {
+            if(Char.IsDigit(c))
+            {
+                if(ans.Length>0)
+                {
+                   ans=ans.Remove(ans.Length-1);
+                }
+            }
+            else
+            {
+                ans+=c;
+            }
+        }
+       return ans;
+    }
 }
