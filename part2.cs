@@ -15,6 +15,7 @@ using System.Globalization;
 using System.Transactions;
 using Microsoft.VisualBasic;
 using System.Dynamic;
+using System.Runtime.Intrinsics.Arm;
 
 public class Solution {
      public int LongestMonotonicSubarray(int[] nums) {
@@ -381,4 +382,137 @@ public class Solution {
         }
        return ans;
     }
+    static string Decipher(string ciphertext, string knownWord)
+    {
+        char[] original = new char[ciphertext.Length];
+        int key = GetKey(ciphertext, knownWord);
+
+        for (int i = 0; i < ciphertext.Length; i++)
+        {
+            if (ciphertext[i] == ' ')
+            {
+                // Keep spaces as they are
+                original[i] = ' ';
+            }
+            else
+            {
+                // Shift back by key to decipher
+                original[i] = (char)(ciphertext[i] - key);
+            }
+        }
+
+        return new string(original);  // Correct way to convert char[] to string
+    }
+
+    static int GetKey(string ciphertext, string knownWord)
+    {
+        List<string> words = new List<string>();
+        string[] splitWords = ciphertext.Split(' '); // Split ciphertext into words
+        int knownLen = knownWord.Length;
+
+        foreach (string word in splitWords)
+        {
+            if (word.Length == knownLen)  // Find word with same length as knownWord
+            {
+                int key = word[0] - knownWord[0]; // Compute shift key
+
+                bool valid = true;
+                for (int j = 1; j < knownWord.Length; j++)
+                {
+                    if ((word[j] - knownWord[j]) != key)
+                    {
+                        valid = false;
+                        break;
+                    }
+                }
+
+                if (valid) return key; // Return key if matching pattern is found
+            }
+        }
+
+        return 0; // Default case if no match is found
+    }
+      public int NumTilings(int n) {
+        if(n==1)return 1;
+        if (n==2) return 2;
+        int MOD=1_000_000_007;
+        int []dp=new int [n+1];   
+        dp[0]=0;
+        dp[1]=1;
+        dp[2]=2;
+        for(int i=3;i<=n;i++)
+        {
+            dp[i]=(int)((2.0*dp[i-1]+dp[i-3])%MOD);
+        }
+        return dp[n];
+    }
+      public int MaximumSum(int[] nums) {
+        int max=-1;
+        Dictionary<int, int> map = new Dictionary<int, int>();
+        foreach (int num in nums)
+        {
+            int s=SumDigits(num);
+            if(map.ContainsKey(s))
+            {
+                max=Math.Max(max,map[s]+num);
+                map[s]=Math.Max(map[s],num);// Keep the largest number for this digit sum
+            }
+            else
+            {
+                map[s]=num;
+            }
+        } 
+        return max;       
+    }
+
+    private int SumDigits(int v)
+    {
+        int s=0;
+        while (v>0)
+        {
+            s+=v%10;
+            v/=10;
+        }
+        return s;
+    }
+    public int UniquePaths(int m, int n) {
+         // Create a 2D DP array where dp[i][j] stores the number of ways to reach cell (i, j)
+        int[,] dp = new int[m, n];
+         // Base case: There's only one way to reach any cell in the first row (move right only)
+        for (int i = 0; i < m; i++) dp[i,0]=1;
+        // Base case: There's only one way to reach any cell in the first column (move down only)
+        for (int j = 0; j < n; j++) dp[0,j]=1;
+         // dp[i][j] = dp[i-1][j] (coming from top) + dp[i][j-1] (coming from left)
+        for (int i = 1; i < m; i++)
+        {
+            for (int j = 1; j < n; j++)
+            {
+                dp[i,j]=dp[i-1,j]+dp[i,j-1];
+            }
+        }
+         // The bottom-right corner contains the total number of unique paths
+        return dp[m-1,n-1];
+    }
+    public int LongestCommonSubsequence(string text1, string text2) {
+        int m=text1.Length; int n= text2.Length;
+        int[,]dp=new int[m+1,n+1];
+        for (int i = 1; i <= m; i++)
+        {
+            for (int j = 1; j <=n; j++)
+            {
+                if(text1[i-1]==text2[j-1])
+                {
+                    // If characters match, increase LCS length
+                    dp[i,j]=1+dp[i-1,j-1];
+                }
+                else
+                {
+                     // Otherwise, take the max LCS by either excluding a character from text1 or text2
+                    dp[i,j]=Math.Max(dp[i-1,j],dp[i,j-1]);
+                }
+            }        
+        }
+        return dp[m,n];   
+    }
+
 }
