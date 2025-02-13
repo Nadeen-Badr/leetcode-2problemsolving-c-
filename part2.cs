@@ -543,9 +543,7 @@ public class Solution {
         {
             cash=Math.Max(cash,hold+prices[i]-fee); // Sell and update cash
             hold=Math.Max(hold,cash-prices[i]);//buy and update hold
-
         }
-        
+        return cash;// Max profit when we are not holding any stock
     }
-
 }
