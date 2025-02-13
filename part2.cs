@@ -514,5 +514,38 @@ public class Solution {
         }
         return dp[m,n];   
     }
+      public int MinOperations(int[] nums, int k) {
+        PriorityQueue<long,long>pq=new PriorityQueue<long, long>();
+        int operation=0;
+        foreach (var n in nums)
+        {
+            pq.Enqueue(n,n);
+        }
+        while(pq.Count>=2&&pq.Peek()<k)
+        {
+            long x=pq.Dequeue();
+            long y=pq.Dequeue();
+            long val=Math.Min(x,y)*2+Math.Max(x,y);
+            pq.Enqueue(val,val);
+            operation++;
+        }
+        return operation;
+    }
+    public int MaxProfit(int[] prices, int fee) {
+        int n=prices.Length;
+        // If we buy on the first day
+        // hold  The maximum profit we can have when we currently own a stock.
+        int hold=-prices[0];
+        //if we dont buy at all
+        //The maximum profit we can have when we don’t own a stock.
+        int cash=0;
+        for(int i=1;i<n;i++)
+        {
+            cash=Math.Max(cash,hold+prices[i]-fee); // Sell and update cash
+            hold=Math.Max(hold,cash-prices[i]);//buy and update hold
+
+        }
+        
+    }
 
 }
