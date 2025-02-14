@@ -1,3 +1,4 @@
+using System;
 using System.Net.Http.Headers;
 using System.Security.Cryptography;
 using System.Runtime.InteropServices;
@@ -546,4 +547,72 @@ public class Solution {
         }
         return cash;// Max profit when we are not holding any stock
     }
+    public int MinDistance(string word1, string word2) {
+        int m=word1.Length;
+        int n=word2.Length;
+        int[,]dp=new int[m+1,n+1];
+        // Base case 1: If word1 is empty, we need to insert all characters of word2.
+        for(int i=0;i<=m;i++) dp[i,0]=i;
+         // Base case 2: If word2 is empty, we need to delete all characters of word1.
+        for(int j=0;j<=n;j++) dp[0,j]=j;
+        for (int i = 1; i <= m; i++) {
+            for (int j = 1; j <= n; j++) 
+            {
+            // If the current characters match, no extra operation is needed.
+            // We carry forward the previous result (diagonally left-up in the table).
+                if(word1[i-1]==word2[j-1]) dp[i,j]=dp[i-1,j-1];
+                else {
+                // If the characters are different, we consider three possible operations:
+                // 1. Delete a character from word1 (move up in the table)
+                // 2. Insert a character into word1 (move left in the table)
+                // 3. Replace the character (move diagonally left-up in the table)
+                    dp[i,j]=Math.Min(dp[i-1,j]+1,//move up,
+                            Math.Min(dp[i,j-1]+1,// move left
+                                    dp[i-1,j-1]+1 ));//move diaognal
+                }
+            }
+        }
+        return dp[m,n];
+    }
+    public int[] CountBits(int n) {
+        int []ans=new int[n+1];
+        for (int i = 0; i <=n; i++)
+        {
+            ans[i]=Convert.ToString(i,2).Count(c=>c=='1');
+        }
+        return ans;
+    }
+      public int HammingWeight(int n) {
+      return Convert.ToString(n,2).Count(c=>c=='1');   
+    }
+     public int SingleNumber(int[] nums) {
+        int res=0;
+        //Since every number appears twice, XOR cancels out the duplicate numbers
+        foreach (var n in nums)
+        {
+            //1 ^ 1) ^ (2 ^ 2) ^ 4 = 0 ^ 0 ^ 4 = 4
+            res^=n;
+        }
+        return res;   
+    }
+    public class ProductOfNumbers {
+        private List<int>prefix;
+    public ProductOfNumbers() {
+        prefix=new List<int>{1};
+    }
+    
+    public void Add(int num) {
+        if(num==0)  prefix=new List<int>{1};
+           // Multiply the last stored product with the new number and store it
+        else prefix.Add(prefix[prefix.Count-1]*num);
+    }
+    
+    public int GetProduct(int k) {
+       int n=prefix.Count;
+        // If k is greater than available elements (due to a zero reset), return 0
+        if (k >= n) return 0;
+        // Calculate the product of the last k elements using prefix division
+       return prefix[n-1]/prefix[n-k-1]; 
+    }
+}
 }
