@@ -614,5 +614,68 @@ public class Solution {
         // Calculate the product of the last k elements using prefix division
        return prefix[n-1]/prefix[n-k-1]; 
     }
+     public int MinFlips(int a, int b, int c) {
+        int filps=0;
+        while(a>0||b>0||c>0)
+        {
+            int BA=a&1; //last bit of a -> right most
+            int BB=b&1;
+            int BC=c&1;
+            if(BC==1) //At least one of bitA or bitB must be 1
+            {
+                if(BA==0&&BB==0) filps++;
+            }
+            else
+            {
+                 // Both bitA and bitB must be 0
+                 filps+=BA+BB;// If bitA is 1, flip it. If bitB is 1, flip it.
+            }
+            // Shift bits to the right
+            a>>=1;
+            b>>=1;
+            c>>=1;
+        }
+         return filps;
+    }
+}
+public class TrieNode {
+    public Dictionary<char, TrieNode> Children = new Dictionary<char, TrieNode>();
+    public bool IsEndOfWord = false; // Marks the end of a valid word
+}
+    public class Trie {
+        private TrieNode root;
+    public Trie() {
+        root=new TrieNode();
+    }
+    
+    public void Insert(string word) {
+        TrieNode node=root;
+        foreach (var c in word)
+        {
+            if(!node.Children.ContainsKey(c)) node.Children[c]=new TrieNode();
+            node=node.Children[c];
+        }
+        node.IsEndOfWord=true;
+    }
+    
+    public bool Search(string word) {
+        TrieNode n=FindNode(word);
+        return n!=null&&n.IsEndOfWord;
+    }
+
+        private TrieNode FindNode(string word)
+        {
+            TrieNode node=root;
+             foreach (var c in word)
+             {
+                if(!node.Children.ContainsKey(c)) return null;
+                node=node.Children[c];
+             }   
+             return node;
+        }
+
+        public bool StartsWith(string prefix) {
+            return FindNode(prefix)!=null;
+    }
 }
 }
