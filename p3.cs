@@ -269,5 +269,110 @@ public class p3 {
         }
         return new string(res);
     }
+    public string GetHappyString(int n, int k) {
+        List<string> happyStrings = new List<string>();
+        GenrerateHappy(n,"",happyStrings);
+        // If k is larger than the total count, return an empty string
+        return k<=happyStrings.Count? happyStrings[k-1]:"";
+    }
+
+    private void GenrerateHappy(int n, string curr, List<string> happyStrings)
+    {
+        if(curr.Length==n)
+        {
+            happyStrings.Add(curr);
+            return;
+        }
+        foreach (var c in new char[]{'a','b','c'})
+        {
+             // Ensure adjacent characters are different
+             if(curr.Length==0||curr[^1]!=c)
+             {
+                GenrerateHappy(n,curr+c,happyStrings);
+             }
+        }
+    }
+    public class TreeNode {
+      public int val;
+      public TreeNode left;
+      public TreeNode right;
+      public TreeNode(int val=0, TreeNode left=null, TreeNode right=null) {
+          this.val = val;
+          this.left = left;
+          this.right = right;
+      }
+  }
+  public class FindElements {
+    private HashSet<int>vals;
+    public FindElements(TreeNode root) {
+        vals=new HashSet<int>();
+        Recover(root,0);
+    }
+
+        private void Recover(TreeNode n, int v)
+        {
+            if(n==null) return;
+            n.val=v;
+            vals.Add(v);
+            Recover(n.left,2*v+1);
+            Recover(n.right,2*v+2);
+        }
+
+        public bool Find(int target) {
+        return vals.Contains(target);
+    }
+public TreeNode RecoverFromPreorder(string traversal) {
+    if (string.IsNullOrEmpty(traversal)) return null;
+
+    Stack<TreeNode> stack = new Stack<TreeNode>();
+    int i = 0, n = traversal.Length;
+
+    while (i < n) {
+        int level = 0;
+
+        // Count the number of dashes to determine depth
+        while (i < n && traversal[i] == '-') {
+            level++;
+            i++;
+        }
+
+        // Read the number value
+        int start = i;
+        while (i < n && char.IsDigit(traversal[i])) {
+            i++;
+        }
+        int val = int.Parse(traversal.Substring(start, i - start));
+
+        // Create the new node
+        TreeNode node = new TreeNode(val);
+
+        // Ensure stack only keeps nodes of higher levels
+        while (stack.Count > level) {
+            stack.Pop();
+        }
+
+        // Attach to parent
+        if (stack.Count > 0) {
+            if (stack.Peek().left == null) {
+                stack.Peek().left = node;
+            } else {
+                stack.Peek().right = node;
+            }
+        }
+
+        // Push the current node onto the stack
+        stack.Push(node);
+    }
+
+    // Root is the bottom-most node in the stack
+    while (stack.Count > 1) {
+        stack.Pop();
+    }
+
+    return stack.Peek();
+}
+
+}
+
 }
 
