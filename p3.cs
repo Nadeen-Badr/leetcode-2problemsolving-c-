@@ -1,3 +1,5 @@
+using System.Xml.Serialization;
+using System.ComponentModel.Design.Serialization;
 using System;
 using System.Net.Http.Headers;
 using System.Security.Cryptography;
@@ -373,6 +375,26 @@ public TreeNode RecoverFromPreorder(string traversal) {
 }
 
 }
+    private int preindex=0;
+    private Dictionary<int,int>postindexmap;
+      public TreeNode ConstructFromPrePost(int[] preorder, int[] postorder) {
+        postindexmap=new Dictionary<int, int>();
+        for (int i = 0; i < postorder.Length; i++)
+        {
+            postindexmap[postorder[i]]=i;
+        }
+        return Construt(preorder,postorder,0,postorder.Length-1);
+    }
 
+    private TreeNode Construt(int[] preorder, int[] postorder, int start, int end)
+    {
+        if(preindex>=preorder.Length||start>end) return null;
+        TreeNode root=new TreeNode(preorder[preindex++]);
+        if(start==end) return root;
+        int letsub=postindexmap[preorder[preindex]];
+        root.left=Construt(preorder,postorder,start,letsub);
+        root.right=Construt(preorder,postorder,letsub+1,end-1);
+        return root;
+    }
 }
 
