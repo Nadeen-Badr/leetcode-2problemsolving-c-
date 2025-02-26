@@ -19,6 +19,7 @@ using System.Transactions;
 using Microsoft.VisualBasic;
 using System.Dynamic;
 using System.Runtime.Intrinsics.Arm;
+using System.Diagnostics.CodeAnalysis;
 
 public class p3 {
      public int PunishmentNumber(int n) {
@@ -396,5 +397,128 @@ public TreeNode RecoverFromPreorder(string traversal) {
         root.right=Construt(preorder,postorder,letsub+1,end-1);
         return root;
     }
+    public int MostProfitablePath(int[][] edges, int bob, int[] amount) {
+        int n=amount.Length;
+        List<int>[]tree=new List<int>[n];
+        //Build the adjacency list representation of the tree
+        for (int i = 0; i < n; i++)
+        {
+            tree[i]=new List<int>();
+        }
+        foreach (var edge in edges)
+        {
+            tree[edge[0]].Add(edge[1]);
+            tree[edge[1]].Add(edge[0]);
+        }
+        // Step 2: Find Bob's arrival time at each node
+        int [] bobtime=new int[n];
+        Array.Fill(bobtime,int.MaxValue);
+        // Run DFS to record the time Bob takes to reach each node from his starting position
+        FindBobPath(bob,0,tree,bobtime,0,new HashSet<int>());
+         // Step 3: Find Alice's optimal path using DFS
+         return DFS_Alice(0,0,tree,bobtime,amount,new HashSet<int>());
+
+    }
+        private bool FindBobPath(int node, int time, List<int>[] tree, int[] bobtime, int target, HashSet<int> visited)
+    {
+        visited.Add(node);
+        bobtime[node]=time;
+        // If Bob has reached his target (node 0), return true
+        if(node==target)return true;
+        // Explore all neighbors to continue Bob's path to node 0
+        foreach (var neighbor in tree[node])
+        {
+            if(!visited.Contains(neighbor)&&FindBobPath(neighbor,time+1,tree,bobtime,target,visited))
+            {
+                return true;
+            }
+        }
+        // If this node is not on Bob’s path to the root, reset the time to an unreachable value
+        bobtime[node]=int.MaxValue;
+        return false;
+    }
+    private int DFS_Alice(int node, int time, List<int>[] tree, int[] bobtime, int[] amount, HashSet<int> visited)
+    {
+       visited.Add(node);
+       // Step 1: Calculate Alice's earnings at the current node
+       int curr=0;
+       if(time<bobtime[node])
+       {
+            // Alice reaches first, so she takes the full amount
+            curr=amount[node];
+       }
+       else if(time==bobtime[node])
+       {
+        // Alice and Bob reach at the same time, so they split the amount
+        curr=amount[node]/2;
+       }
+        // Step 2: Explore all possible paths to find the best route
+        int max=int.MinValue;
+        bool isleaf= true; // Assume it's a leaf unless we find children
+        foreach (var neighbor in tree[node])
+        {
+            if(!visited.Contains(neighbor))
+            {
+                isleaf=false;
+                max=Math.Max(max,DFS_Alice(neighbor,time+1,tree,bobtime,amount,visited));
+            }
+        }
+        visited.Remove(node); // Backtrack to allow other paths
+         // If it's a leaf node, return just the current amount (no further paths)
+        return curr+(isleaf?0:max);
+    }
+     
+     public int NumOfSubarrays(int[] arr) {
+        const int MOD = 1000000007;
+        int oddcount=0;int evencount=1;// Start with evenCount = 1 to include empty subarray case
+        int preifx=0; int result=0;
+        foreach (int num in arr)
+        {
+            preifx+=num;
+             // If the prefix sum is odd
+             if(preifx%2==1)
+             {
+                // Odd prefix sum pairs with previous even sums
+                result=(result+evencount)%MOD;
+                oddcount++;
+             }
+             else
+             {
+                // Even prefix sum pairs with previous odd sums
+                result=(result+oddcount)%MOD;
+                evencount++;
+             }
+        }
+        return result;
+     }
+     public int MaxAbsoluteSum(int[] nums) {
+        int minsum=0,maxsum=0,currmin=0,currmax=0;
+        foreach (int num in nums)
+        {
+             // Compute maximum subarray sum using Kadane's Algorithm
+             currmax=Math.Max(num,currmax+num);
+             maxsum=Math.Max(maxsum,currmax);
+              // Compute minimum subarray sum using Kadane's Algorithm (tracking negative sums)
+              currmin=Math.Min(num,currmin+num);
+              minsum=Math.Min(minsum,currmin); 
+        }
+        // Return the maximum absolute sum from either maxSum or the absolute value of minSum
+        return Math.Max(maxsum,Math.Abs(minsum));   
+    }
+       public int MaxSubArray(int[] nums) {
+        int curr=0;
+        int max=nums[0];
+        foreach (int num in nums)
+        {
+            if(curr<0) curr=0; //reset
+            curr+=num;
+            max=Math.Max(max,curr);
+        }
+        return max;
+    }
+
+
+
+ 
 }
 
